@@ -18,18 +18,21 @@ Apply these changes in order. Each section tells you exactly which file to edit 
 // Called by BB Learn HTML modules when a staff member starts or completes
 // a module. Accepts { uid, moduleId, moduleTitle, event } in the POST body.
 // No Firebase auth required — validates that the uid exists in Firestore.
+//
+// NOTE: `admin` must already be initialised at the top of this file.
+// Your existing functions already do this — don't add a second initializeApp().
 
 const { onRequest } = require('firebase-functions/v2/https');
-const corsLib = require('cors');
-const trainingCors = corsLib({
-  origin: ['https://bblearns.netlify.app', 'https://bbplatform.netlify.app'],
-  methods: ['POST', 'OPTIONS'],
-});
 
-exports.recordTrainingCompletion = onRequest(async (req, res) => {
-  trainingCors(req, res, async () => {
-    if (req.method === 'OPTIONS') return res.status(204).send('');
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+exports.recordTrainingCompletion = onRequest(
+  {
+    // v2 built-in CORS — no `cors` npm package needed
+    cors: ['https://bblearns.netlify.app', 'https://bbplatform.netlify.app'],
+  },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
 
     const { uid, moduleId, moduleTitle, event } = req.body || {};
 
@@ -65,7 +68,7 @@ exports.recordTrainingCompletion = onRequest(async (req, res) => {
       if (trainingSnap.exists) {
         await trainingRef.update({ completedAt: now });
       } else {
-        // Edge case: completed without a started event (e.g. page reload mid-module)
+        // Edge case: completed without a started event (e.g. browser refresh mid-module)
         await trainingRef.set({
           moduleId,
           moduleTitle: moduleTitle || moduleId,
@@ -76,26 +79,29 @@ exports.recordTrainingCompletion = onRequest(async (req, res) => {
     }
 
     return res.status(200).json({ ok: true });
-  });
-});
+  }
+);
 ```
 
-**Note on `cors`:** Check if `cors` is already in `functions/package.json`. If not, run:
-```bash
-cd functions
-npm install cors
-```
+**No extra packages needed** — the `cors` option is built into Firebase Functions v2.
 
 **After deploying:**
 ```bash
 firebase deploy --only functions
 ```
-Then go to **Firebase Console → Functions → recordTrainingCompletion** and copy the URL.
-It will look like: `https://recordtrainingcompletion-XXXXXXXX-uc.a.run.app`
 
-Then paste it into both bb-learn module files, replacing `'PASTE_FUNCTION_URL_HERE'`:
-- `C:\Users\rober\bb-learn\bb-module1.html` — line ~1905
-- `C:\Users\rober\bb-learn\bb-module2.html` — line ~1905
+⚠️ **Important — get the correct URL:**  
+This function is **Gen 2** (`v2/https`), so its URL is **not** the old `cloudfunctions.net` format.  
+After deploying, go to **Firebase Console → Functions → recordTrainingCompletion** and copy the trigger URL.  
+It will look like: `https://recordtrainingcompletion-XXXXXXXX-uc.a.run.app`  
+(The `XXXXXXXX` part is unique to your project — it only appears after first deploy.)
+
+Then paste it into both bb-learn module files, replacing the placeholder:
+- `C:\Users\rober\bb-learn\bb-module1.html` — find `TRAINING_API =`
+- `C:\Users\rober\bb-learn\bb-module2.html` — find `TRAINING_API =`
+
+**Note on the URL currently in those files:**  
+The `us-central1-bb-platform-5c296.cloudfunctions.net` format is the Gen 1 URL — it won't reach a Gen 2 function. Update it to the Cloud Run URL once you have it from the console.
 
 ---
 

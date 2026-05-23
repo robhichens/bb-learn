@@ -1172,6 +1172,20 @@ body {
   text-decoration: underline;
 }
 .milestone-review-link:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+.milestone-back-link {
+  display: block;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--charcoal);
+  opacity: 0.6;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  transition: opacity 200ms;
+}
+.milestone-back-link:hover { opacity: 1; }
+.milestone-back-link:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
 
 /* ── PRINT ────────────────────────────────────────────────── */
 @media print {
@@ -1745,12 +1759,39 @@ body {
       </div>
       <button class="milestone-cta" onclick="saveProtocolCard()">Save BB Protocol Card</button>
       <button class="milestone-review-link" onclick="reviewModule()">Review any section →</button>
+      <button class="milestone-back-link hidden" id="back-to-training" onclick="backToTraining()">← Back to My Training</button>
     </div>
   </div>
 
 </div><!-- /app -->
 
 <script>
+// ── TRAINING INTEGRATION ───────────────────────────────────
+// After deploying the Cloud Function, replace the placeholder below with the
+// real URL. Firebase Console → Functions → recordTrainingCompletion → copy URL.
+const TRAINING_API = 'PASTE_FUNCTION_URL_HERE';
+const MODULE_ID    = 'module-2';
+const MODULE_TITLE = 'Child Safety & Mandated Reporting';
+
+function getUID() {
+  return new URLSearchParams(window.location.search).get('uid') || null;
+}
+
+function recordTrainingEvent(event) {
+  const uid = getUID();
+  if (!uid) return; // Standalone / local — no platform session
+  if (!TRAINING_API || TRAINING_API === 'PASTE_FUNCTION_URL_HERE') return; // Not yet configured
+  fetch(TRAINING_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uid, moduleId: MODULE_ID, moduleTitle: MODULE_TITLE, event })
+  }).catch(() => {}); // Silent fail — never interrupt the learner
+}
+
+function backToTraining() {
+  window.location.href = 'https://bbplatform.netlify.app/training';
+}
+
 // ── STATE ──────────────────────────────────────────────────
 const STORAGE_KEY = 'bb_module2_progress';
 let progress = loadProgress();
@@ -1780,6 +1821,7 @@ function startModule() {
   if (!progress.startedAt) {
     progress.startedAt = new Date().toISOString();
     saveProgress();
+    recordTrainingEvent('started');
   }
   revealSection(1);
   updateProgressBar();
@@ -2032,6 +2074,7 @@ function answerCap(q, chosen, correct, btn) {
 function triggerMilestone() {
   progress.completedAt = new Date().toISOString();
   saveProgress();
+  recordTrainingEvent('completed');
   document.getElementById('milestone-card').classList.add('visible');
 }
 
@@ -2101,6 +2144,11 @@ function reviewModule() {
 
 // ── INIT ───────────────────────────────────────────────────
 restoreState();
+// Show "Back to My Training" link when launched from BB Platform
+if (getUID()) {
+  const btn = document.getElementById('back-to-training');
+  if (btn) btn.classList.remove('hidden');
+}
 </script>
 </body>
 </html>

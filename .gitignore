@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.local
+.env*.local
+
+# Claude — keep config and memory, exclude sensitive logs
+.claude/session-env
+.claude/shell-snapshots
+.claude/debug/

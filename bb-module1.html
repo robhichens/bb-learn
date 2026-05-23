@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BB Learn — Module 1: Financial Literacy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --coral:       #F08782;
+  --coral-soft:  #FAE8E7;
+  --coral-dk:    #C45E59;
+  --yellow:      #FFD437;
+  --yellow-soft: #FFF8D6;
+  --yellow-dk:   #6d4c00;
+  --sky:         #AEDFE5;
+  --sky-soft:    #E8F7F9;
+  --sky-dk:      #2a7a82;
+  --mid-gray:    #A7A9AC;
+  --lt-gray:     #D1D2D4;
+  --dk-gray:     #6D6E71;
+  --charcoal:    #545454;
+  --cream:       #FAFAF5;
+  --white:       #FFFFFF;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--cream);
+  color: var(--charcoal);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* ── PROGRESS BAR ─────────────────────────────────────────── */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--white);
+  border-bottom: 1px solid var(--lt-gray);
+  padding: 10px 20px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+#progress-bar.visible { display: flex; }
+#pb-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dk-gray);
+  white-space: nowrap;
+  min-width: 160px;
+}
+#pb-track {
+  flex: 1;
+  height: 6px;
+  background: var(--lt-gray);
+  border-radius: 50px;
+  overflow: hidden;
+}
+#pb-fill {
+  height: 100%;
+  background: var(--coral);
+  border-radius: 50px;
+  width: 0%;
+  transition: width 600ms ease;
+}
+#pb-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  border: 2px solid var(--lt-gray);
+  background: var(--white);
+  color: var(--mid-gray);
+  transition: all 200ms;
+  cursor: default;
+}
+.step-dot.completed {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: var(--white);
+}
+.step-dot.current {
+  border-color: var(--coral);
+  color: var(--coral);
+  transform: scale(1.1);
+}
+
+/* ── MODULE CONTENT ───────────────────────────────────────── */
+#app { position: relative; }
+
+#module-content {
+  padding-top: 60px;
+  max-width: 560px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 80px;
+}
+
+.section {
+  margin-bottom: 60px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+  pointer-events: none;
+}
+.section.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+.section.locked-placeholder {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: none;
+}
+
+/* ── COVER SCREEN ─────────────────────────────────────────── */
+#cover-screen {
+  min-height: 100vh;
+  background: var(--charcoal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.cover-blob-coral {
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 340px; height: 340px;
+  background: var(--coral);
+  opacity: 0.10;
+  border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+}
+.cover-blob-yellow {
+  position: absolute;
+  bottom: -100px; left: -60px;
+  width: 300px; height: 300px;
+  background: var(--yellow);
+  opacity: 0.08;
+  border-radius: 40% 60% 30% 70% / 60% 40% 50% 50%;
+}
+.cover-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+  padding: 48px 32px;
+  text-align: center;
+}
+.cover-eyebrow {
+  display: inline-block;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 50px;
+  margin-bottom: 28px;
+}
+.cover-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+.cover-subtitle {
+  font-size: 16px;
+  color: rgba(255,255,255,0.60);
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+.cover-who {
+  font-size: 13px;
+  color: rgba(255,255,255,0.40);
+  margin-bottom: 40px;
+}
+.btn-start {
+  display: inline-block;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  min-height: 44px;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(240,135,130,0.40);
+}
+.btn-start:focus {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+
+/* ── SHARED COMPONENTS ────────────────────────────────────── */
+.eyebrow-pill {
+  display: inline-block;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+}
+
+.situation-hook {
+  background: var(--yellow-soft);
+  border-left: 4px solid var(--yellow);
+  border-radius: 0 16px 16px 0;
+  padding: 24px 24px 24px 20px;
+  margin-bottom: 28px;
+}
+.situation-hook p {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--charcoal);
+  line-height: 1.5;
+}
+
+.body-copy {
+  font-size: 15px;
+  color: var(--dk-gray);
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.why-callout {
+  background: var(--sky-soft);
+  border-left: 4px solid var(--sky);
+  border-radius: 0 12px 12px 0;
+  padding: 18px 20px 18px 16px;
+  margin-bottom: 28px;
+}
+.why-callout-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sky-dk);
+  margin-bottom: 6px;
+}
+.why-callout p {
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+}
+
+.btn-coral {
+  display: inline-block;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 28px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  min-height: 44px;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.btn-coral:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(240,135,130,0.40);
+}
+.btn-coral:focus {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+.btn-coral:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-coral-outline {
+  display: inline-block;
+  background: transparent;
+  color: var(--coral);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 50px;
+  border: 2px solid var(--coral);
+  cursor: pointer;
+  min-height: 44px;
+  transition: transform 200ms ease, background 200ms ease;
+}
+.btn-coral-outline:hover {
+  transform: translateY(-2px);
+  background: var(--coral-soft);
+}
+.btn-coral-outline:focus {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+
+.section-continue { margin-top: 32px; }
+
+.help-link {
+  display: block;
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--mid-gray);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+}
+.help-link:hover { text-decoration: underline; }
+
+.help-panel {
+  display: none;
+  background: var(--sky-soft);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+}
+.help-panel.open { display: block; }
+.help-panel p { margin-bottom: 8px; }
+.help-panel p:last-child { margin-bottom: 0; font-style: italic; color: var(--mid-gray); font-size: 13px; }
+
+.locked-msg {
+  text-align: center;
+  padding: 24px;
+  font-size: 13px;
+  color: var(--mid-gray);
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px dashed var(--lt-gray);
+}
+
+/* ── SECTION 2 — PAY STUB ─────────────────────────────────── */
+.paystub-card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.paystub-header {
+  background: var(--charcoal);
+  color: var(--white);
+  padding: 16px 20px;
+}
+.paystub-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+.paystub-company {
+  font-size: 14px;
+  font-weight: 700;
+}
+.paystub-period {
+  font-size: 11px;
+  opacity: 0.6;
+}
+.paystub-employee {
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.paystub-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mid-gray);
+  padding: 10px 20px 6px;
+  background: var(--cream);
+  border-bottom: 1px solid var(--lt-gray);
+}
+
+.paystub-row {
+  border-bottom: 1px solid var(--lt-gray);
+}
+.paystub-row:last-child { border-bottom: none; }
+
+.paystub-row-main {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: background 150ms;
+  min-height: 44px;
+}
+.paystub-row-main:hover { background: var(--cream); }
+.paystub-row-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--charcoal);
+}
+.paystub-row-amount {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dk-gray);
+  margin-right: 10px;
+}
+.paystub-row-amount.highlight { color: var(--coral); }
+.paystub-row-amount.net-pay-amount {
+  color: var(--charcoal);
+  font-size: 16px;
+  font-weight: 700;
+}
+.paystub-expand-icon {
+  font-size: 12px;
+  color: var(--mid-gray);
+  transition: transform 200ms;
+  width: 16px;
+  text-align: center;
+}
+.paystub-row.expanded .paystub-expand-icon { transform: rotate(180deg); }
+
+.paystub-explanation {
+  display: none;
+  background: var(--sky-soft);
+  padding: 12px 20px 14px;
+  font-size: 13px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+  border-top: 1px solid var(--sky);
+}
+.paystub-row.expanded .paystub-explanation { display: block; }
+
+.paystub-row.net-row .paystub-row-main {
+  background: var(--coral-soft);
+}
+.paystub-row.net-row .paystub-row-name { color: var(--charcoal); font-size: 15px; }
+
+/* Formula card */
+.formula-card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.formula-card-accent { height: 4px; background: var(--coral); }
+.formula-card-body { padding: 24px; text-align: center; }
+.formula-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--charcoal);
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+.formula-text .op { color: var(--coral); }
+.formula-note {
+  font-size: 13px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+}
+
+/* Quiz */
+.quiz-block {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.quiz-question {
+  font-size: 15px;
+  color: var(--charcoal);
+  line-height: 1.7;
+  margin-bottom: 18px;
+  font-style: italic;
+}
+.quiz-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+.quiz-input {
+  flex: 1;
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  padding: 10px 14px;
+  border: 1.5px solid var(--lt-gray);
+  border-radius: 10px;
+  color: var(--charcoal);
+  background: var(--white);
+  min-height: 44px;
+  transition: border-color 200ms;
+}
+.quiz-input:focus {
+  outline: none;
+  border-color: var(--coral);
+}
+.quiz-btn {
+  background: var(--coral);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  min-height: 44px;
+  font-family: 'Inter', sans-serif;
+  transition: transform 200ms ease;
+}
+.quiz-btn:hover { transform: translateY(-1px); }
+.quiz-btn:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+
+.quiz-feedback {
+  margin-top: 14px;
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: none;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.quiz-feedback.correct {
+  display: block;
+  background: var(--yellow-soft);
+  color: var(--yellow-dk);
+}
+.quiz-feedback.guided {
+  display: block;
+  background: var(--sky-soft);
+  color: var(--sky-dk);
+}
+.hint-visual {
+  margin-top: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--sky-dk);
+  padding: 10px 14px;
+  background: var(--white);
+  border-radius: 8px;
+  letter-spacing: 0.02em;
+}
+
+/* ── SECTION 3 — PTO vs RTO ───────────────────────────────── */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 480px) {
+  .comparison-grid { grid-template-columns: 1fr; }
+}
+.compare-card {
+  border-radius: 16px;
+  padding: 20px;
+}
+.compare-card.pto {
+  background: var(--yellow-soft);
+  border-left: 4px solid var(--yellow);
+}
+.compare-card.rto {
+  background: var(--sky-soft);
+  border-left: 4px solid var(--sky);
+}
+.compare-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 50px;
+  margin-bottom: 10px;
+}
+.compare-badge.pto { background: var(--yellow); color: var(--yellow-dk); }
+.compare-badge.rto { background: var(--sky); color: var(--sky-dk); }
+.compare-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 8px;
+}
+.compare-body {
+  font-size: 13px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.compare-tags {
+  font-size: 12px;
+  color: var(--dk-gray);
+  line-height: 1.8;
+}
+
+.example-block {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  padding: 20px 22px;
+  margin-bottom: 24px;
+  position: relative;
+}
+.example-tag {
+  display: inline-block;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 50px;
+  margin-bottom: 12px;
+}
+.example-block p {
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+.example-block strong { color: var(--charcoal); }
+
+/* Scenario interaction */
+.scenario-block { margin-bottom: 24px; }
+.scenario-item {
+  background: var(--white);
+  border-radius: 14px;
+  border: 1.5px solid var(--lt-gray);
+  padding: 18px 18px 14px;
+  margin-bottom: 14px;
+  transition: border-color 200ms;
+}
+.scenario-item.answered { border-color: var(--lt-gray); }
+.scenario-text {
+  font-size: 14px;
+  color: var(--charcoal);
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+.scenario-btns {
+  display: flex;
+  gap: 10px;
+}
+.scenario-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1.5px solid var(--lt-gray);
+  background: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  min-height: 44px;
+  transition: all 150ms;
+  color: var(--charcoal);
+}
+.scenario-btn:hover { border-color: var(--coral); color: var(--coral); }
+.scenario-btn:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+.scenario-btn.selected-correct {
+  background: var(--yellow-soft);
+  border-color: var(--yellow);
+  color: var(--yellow-dk);
+}
+.scenario-btn.selected-guided {
+  background: var(--sky-soft);
+  border-color: var(--sky);
+  color: var(--sky-dk);
+}
+.scenario-btn:disabled { cursor: default; }
+
+.scenario-feedback {
+  margin-top: 10px;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: none;
+}
+.scenario-feedback.correct {
+  display: block;
+  background: var(--yellow-soft);
+  color: var(--yellow-dk);
+}
+.scenario-feedback.guided {
+  display: block;
+  background: var(--sky-soft);
+  color: var(--sky-dk);
+}
+
+/* ── SECTION 4 — RELIABILITY REWARD ──────────────────────── */
+.streak-tracker {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  padding: 24px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.streak-days {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.day-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  border: 2px solid var(--lt-gray);
+  background: var(--cream);
+  color: var(--mid-gray);
+  transition: all 300ms ease;
+}
+.day-circle.complete {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: var(--white);
+}
+.day-circle.rto-day {
+  background: var(--sky-soft);
+  border-color: var(--sky);
+  color: var(--sky-dk);
+}
+.day-label { font-size: 9px; margin-top: 2px; }
+.streak-status {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--charcoal);
+  margin-bottom: 16px;
+}
+.streak-toggle-btn {
+  background: var(--cream);
+  border: 1.5px solid var(--lt-gray);
+  color: var(--dk-gray);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  min-height: 44px;
+  transition: all 200ms;
+}
+.streak-toggle-btn:hover { border-color: var(--coral); color: var(--coral); }
+.streak-toggle-btn:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+
+.streak-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  background: var(--white);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 0.5px solid var(--lt-gray);
+}
+.streak-table th {
+  background: var(--charcoal);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 12px 16px;
+  text-align: left;
+}
+.streak-table td {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--dk-gray);
+  border-bottom: 1px solid var(--lt-gray);
+}
+.streak-table tr:last-child td { border-bottom: none; }
+.streak-table tr:nth-child(even) td { background: var(--cream); }
+.streak-continues { color: var(--coral); font-weight: 600; }
+.streak-resets { color: var(--dk-gray); font-weight: 600; }
+
+.reflection-block {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.reflection-q {
+  font-size: 15px;
+  color: var(--charcoal);
+  font-style: italic;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.reflection-note {
+  font-size: 11px;
+  color: var(--mid-gray);
+  margin-bottom: 10px;
+}
+.reflection-textarea {
+  width: 100%;
+  min-height: 100px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--charcoal);
+  padding: 12px 14px;
+  border: 1.5px solid var(--lt-gray);
+  border-radius: 10px;
+  resize: vertical;
+  transition: border-color 200ms;
+  background: var(--cream);
+  line-height: 1.7;
+}
+.reflection-textarea:focus {
+  outline: none;
+  border-color: var(--coral);
+}
+
+/* ── SECTION 5 — DEDUCTIONS ───────────────────────────────── */
+.deductions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 480px) {
+  .deductions-grid { grid-template-columns: 1fr; }
+}
+.deduction-column {
+  border-radius: 16px;
+  overflow: hidden;
+}
+.deduction-col-header {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--white);
+}
+.gov-col .deduction-col-header { background: var(--sky-dk); }
+.bb-col .deduction-col-header { background: var(--yellow-dk); }
+.gov-col { background: var(--sky-soft); border-top: 4px solid var(--sky); border: 0.5px solid var(--sky); border-top: 4px solid var(--sky); }
+.bb-col { background: var(--yellow-soft); border: 0.5px solid var(--yellow); border-top: 4px solid var(--yellow); }
+.deduction-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.deduction-item:last-of-type { border-bottom: none; }
+.deduction-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--charcoal);
+  margin-bottom: 3px;
+}
+.deduction-item-desc {
+  font-size: 12px;
+  color: var(--dk-gray);
+  line-height: 1.6;
+}
+.deduction-footer {
+  padding: 10px 16px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--dk-gray);
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+/* Quick reference card */
+.quick-ref-card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.quick-ref-accent { height: 4px; background: var(--coral); }
+.quick-ref-body { padding: 22px; }
+.quick-ref-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 16px;
+}
+.quick-ref-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.6;
+}
+.quick-ref-item:last-of-type { margin-bottom: 16px; }
+.check-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-weight: 700;
+}
+.quick-ref-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--lt-gray);
+  padding: 12px 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.quick-ref-footer-note {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--mid-gray);
+}
+.copy-link {
+  font-size: 13px;
+  color: var(--coral);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  text-decoration: underline;
+}
+.copy-link:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+
+/* Matching interaction */
+.matching-block {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  padding: 22px;
+  margin-bottom: 20px;
+}
+.matching-instructions {
+  font-size: 13px;
+  color: var(--dk-gray);
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+.matching-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.match-chip {
+  padding: 8px 16px;
+  border-radius: 50px;
+  border: 1.5px solid var(--lt-gray);
+  background: var(--cream);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--charcoal);
+  cursor: pointer;
+  user-select: none;
+  transition: all 150ms;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+.match-chip:hover { border-color: var(--coral); color: var(--coral); }
+.match-chip:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+.match-chip.selected { background: var(--coral); border-color: var(--coral); color: var(--white); }
+.match-chip.placed-correct { background: var(--yellow-soft); border-color: var(--yellow); color: var(--yellow-dk); cursor: default; }
+.match-chip.placed-guided { background: var(--sky-soft); border-color: var(--sky); color: var(--sky-dk); }
+
+.matching-buckets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 420px) {
+  .matching-buckets { grid-template-columns: 1fr; }
+}
+.match-bucket {
+  border-radius: 12px;
+  border: 2px dashed var(--lt-gray);
+  padding: 14px;
+  min-height: 80px;
+  transition: border-color 200ms, background 200ms;
+  cursor: pointer;
+}
+.match-bucket:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+.match-bucket.highlight { border-color: var(--coral); background: var(--coral-soft); }
+.match-bucket-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dk-gray);
+  margin-bottom: 10px;
+}
+.bucket-placed {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bucket-item {
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.bucket-item.correct { background: var(--yellow-soft); color: var(--yellow-dk); }
+.bucket-item.guided { background: var(--sky-soft); color: var(--sky-dk); }
+
+.matching-feedback {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+  display: none;
+}
+.matching-feedback.correct {
+  display: block;
+  background: var(--yellow-soft);
+  color: var(--yellow-dk);
+}
+.matching-feedback.guided {
+  display: block;
+  background: var(--sky-soft);
+  color: var(--sky-dk);
+}
+
+/* ── SECTION 6 — SOMETHING WRONG ─────────────────────────── */
+.steps-flow {
+  margin-bottom: 28px;
+  position: relative;
+}
+.step-item {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 0;
+  position: relative;
+}
+.step-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.step-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+  flex-shrink: 0;
+}
+.step-circle.c1 { background: var(--charcoal); }
+.step-circle.c2 { background: var(--coral); }
+.step-circle.c3 { background: var(--sky-dk); }
+.step-line {
+  width: 2px;
+  flex: 1;
+  background: var(--lt-gray);
+  min-height: 24px;
+  margin: 4px 0;
+}
+.step-content {
+  flex: 1;
+  padding-bottom: 28px;
+}
+.step-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 4px;
+  padding-top: 8px;
+}
+.step-sub {
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+}
+
+/* Alicia card */
+.alicia-card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  overflow: hidden;
+  margin-top: 14px;
+}
+.alicia-header {
+  background: var(--sky-soft);
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--sky);
+}
+.alicia-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--sky-dk);
+}
+.alicia-role {
+  font-size: 13px;
+  color: var(--dk-gray);
+}
+.alicia-body {
+  padding: 16px 18px;
+}
+.alicia-email {
+  font-size: 14px;
+  color: var(--coral);
+  margin-bottom: 14px;
+}
+.alicia-template {
+  background: var(--cream);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--dk-gray);
+  font-style: italic;
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+
+.what-not-todo {
+  background: var(--sky-soft);
+  border-left: 4px solid var(--sky);
+  border-radius: 0 12px 12px 0;
+  padding: 16px 18px;
+  margin-bottom: 28px;
+}
+.what-not-todo p {
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+  margin-bottom: 6px;
+}
+.what-not-todo p:last-child { margin-bottom: 0; }
+
+/* Capstone */
+.capstone-q {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  padding: 22px;
+  margin-bottom: 16px;
+  display: none;
+}
+.capstone-q.active { display: block; }
+.capstone-q-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 8px;
+}
+.capstone-q-text {
+  font-size: 15px;
+  color: var(--charcoal);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.capstone-tap-btns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.capstone-tap-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1.5px solid var(--lt-gray);
+  background: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  min-height: 44px;
+  color: var(--charcoal);
+  transition: all 150ms;
+}
+.capstone-tap-btn:hover { border-color: var(--coral); color: var(--coral); }
+.capstone-tap-btn:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+.capstone-tap-btn.correct { background: var(--yellow-soft); border-color: var(--yellow); color: var(--yellow-dk); }
+.capstone-tap-btn.guided { background: var(--sky-soft); border-color: var(--sky); color: var(--sky-dk); }
+.capstone-tap-btn:disabled { cursor: default; }
+
+.capstone-scenario-card {
+  background: var(--yellow-soft);
+  border-left: 4px solid var(--yellow);
+  border-radius: 0 12px 12px 0;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+.capstone-scenario-card p {
+  font-size: 14px;
+  color: var(--charcoal);
+  line-height: 1.7;
+  margin-bottom: 6px;
+}
+.capstone-scenario-card p:last-child { margin-bottom: 0; }
+
+/* ── MILESTONE SCREEN ─────────────────────────────────────── */
+#milestone-card {
+  display: none;
+  min-height: 100vh;
+  background: var(--yellow);
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 200;
+  overflow-y: auto;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+#milestone-card.visible {
+  display: flex;
+}
+.milestone-inner {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+.milestone-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+}
+.milestone-star {
+  width: 36px;
+  height: 36px;
+  color: var(--coral);
+}
+.milestone-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 16px;
+}
+.milestone-sub {
+  font-size: 15px;
+  color: var(--yellow-dk);
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+.milestone-learned {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+.milestone-learned-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dk-gray);
+  margin-bottom: 14px;
+}
+.milestone-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--charcoal);
+  line-height: 1.6;
+}
+.milestone-item:last-child { margin-bottom: 0; }
+.milestone-cta {
+  background: var(--charcoal);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  min-height: 44px;
+  font-family: 'Inter', sans-serif;
+  transition: transform 200ms ease;
+  margin-bottom: 16px;
+  display: block;
+  width: 100%;
+}
+.milestone-cta:hover { transform: translateY(-2px); }
+.milestone-cta:focus { outline: 2px solid var(--charcoal); outline-offset: 2px; }
+.milestone-review-link {
+  font-size: 13px;
+  color: var(--coral);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  text-decoration: underline;
+}
+
+/* ── PRINT STYLES ─────────────────────────────────────────── */
+@media print {
+  body > #app > #cover-screen,
+  #progress-bar,
+  .section:not(.print-section),
+  #milestone-card { display: none !important; }
+  .print-section { display: block !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* ── UTILITIES ────────────────────────────────────────────── */
+.mt8 { margin-top: 8px; }
+.mt16 { margin-top: 16px; }
+.mt24 { margin-top: 24px; }
+.mb8 { margin-bottom: 8px; }
+.mb16 { margin-bottom: 16px; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- COVER SCREEN -->
+  <div id="cover-screen">
+    <div class="cover-blob-coral"></div>
+    <div class="cover-blob-yellow"></div>
+    <div class="cover-inner">
+      <div class="cover-eyebrow">Module 1 · Financial Literacy</div>
+      <h1 class="cover-title">It's payday. Your deposit is $47 less than you expected.</h1>
+      <p class="cover-subtitle">Do you know what to check first? By the end of this module, you always will.</p>
+      <p class="cover-who">For all BB staff — teachers, assistants, floaters, and site admins.</p>
+      <button class="btn-start" onclick="startModule()">Start Module 1 →</button>
+    </div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div id="progress-bar">
+    <div id="pb-label">You've completed Step 0 of 6</div>
+    <div id="pb-track"><div id="pb-fill"></div></div>
+    <div id="pb-dots">
+      <div class="step-dot current" id="dot-1">1</div>
+      <div class="step-dot" id="dot-2">2</div>
+      <div class="step-dot" id="dot-3">3</div>
+      <div class="step-dot" id="dot-4">4</div>
+      <div class="step-dot" id="dot-5">5</div>
+      <div class="step-dot" id="dot-6">6</div>
+    </div>
+  </div>
+
+  <!-- MODULE CONTENT -->
+  <div id="module-content">
+
+    <!-- SECTION 1 — THE SITUATION -->
+    <div class="section" id="section-1" data-section="1">
+      <div class="eyebrow-pill">The Situation</div>
+      <div class="situation-hook">
+        <p>"It's payday. You open your direct deposit notification and it's $47 less than you expected. You're not sure why. That slight panic, that 'I don't want to look stupid asking' feeling — this module is designed to eliminate that. Forever."</p>
+      </div>
+      <p class="body-copy">Most people don't fully understand their own pay stub. That's not a personal failing — it's just that nobody ever properly explained it. We're going to fix that right now.</p>
+      <p class="body-copy">By the end of this section, you'll be able to look at any pay stub and know exactly what every line means.</p>
+      <div class="why-callout">
+        <div class="why-callout-label">Why this matters</div>
+        <p>When you understand your pay, you can catch errors early, ask the right questions, and feel confident on payday — not anxious.</p>
+      </div>
+      <div class="section-continue">
+        <button class="btn-coral" onclick="completeSection(1)">Ready — show me my pay stub →</button>
+      </div>
+      <button class="help-link" onclick="toggleHelp('help-1')">I need help with this</button>
+      <div class="help-panel" id="help-1">
+        <p>Here's who can help with understanding your pay and this module.</p>
+        <p>Reach out to Alicia in payroll at alicia@brightbeginningsva.com — she's there to answer questions, not to judge them.</p>
+        <p>Or keep going — you can come back to this anytime.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 2 — PAY STUB -->
+    <div class="section" id="section-2" data-section="2">
+      <div class="eyebrow-pill">Your Pay Stub</div>
+      <p class="body-copy">Every BB pay stub has the same structure. Let's walk through each line — what it is, what it means, and what to check.</p>
+
+      <div class="paystub-card">
+        <div class="paystub-header">
+          <div class="paystub-header-top">
+            <span class="paystub-company">Bright Beginnings Preschool</span>
+            <span class="paystub-period">Pay Period: May 5–18, 2025</span>
+          </div>
+          <div class="paystub-employee">Employee: Your Name Here</div>
+        </div>
+
+        <div class="paystub-section-label">Earnings</div>
+
+        <div class="paystub-row" onclick="togglePaystubRow(this)">
+          <div class="paystub-row-main">
+            <span class="paystub-row-name">Gross Pay</span>
+            <span class="paystub-row-amount highlight">$520.00</span>
+            <span class="paystub-expand-icon">▼</span>
+          </div>
+          <div class="paystub-explanation">Your total earnings before anything is taken out. This is the number to check first if something looks wrong. Did you work the hours shown?</div>
+        </div>
+        <div class="paystub-row" onclick="togglePaystubRow(this)">
+          <div class="paystub-row-main">
+            <span class="paystub-row-name">Regular Hours</span>
+            <span class="paystub-row-amount">40 hrs @ $13.00</span>
+            <span class="paystub-expand-icon">▼</span>
+          </div>
+          <div class="paystub-explanation">Your standard hours at your normal pay rate. Check this against your timesheet.</div>
+        </div>
+        <div class="paystub-row" onclick="togglePaystubRow(this)">
+          <div class="paystub-row-main">
+            <span class="paystub-row-name">Overtime</span>
+            <span class="paystub-row-amount">$0.00</span>
+            <span class="paystub-expand-icon">▼</span>
+          </div>
+          <div class="paystub-explanation">Any hours over 40 in a week, paid at 1.5× your regular rate.</div>
+        </div>
+        <div class="paystub-row" onclick="togglePaystubRow(this)">
+          <div class="paystub-row-main">
+            <span class="paystub-row-name">PTO Used</span>
+            <span class="paystub-row-amount">0 hrs</span>
+            <span class="paystub-expand-icon">▼</span>
+          </div>
+          <div class="paystub-explanation">Planned, approved time off you took this period. Doesn't affect your Reliability Reward streak.</div>
+        </div>
+
+        <div class="paystub-section-label">Deductions</div>
+
+        <div class="paystub-row" onclick="togglePaystubRow(this)">
+          <div class="paystub-row-main">
+            <span class="paystub-row-name">Federal Income Tax</span>
+            <span class="paystub-row-amount">−$42.00</span>
+            <span class="paystub-expand-icon">▼</span>
+          </div>
+          <div class="paystub-explanation">Required by law. The amount depends on your W-4 filing. BB doesn't control this.</div>
+        </div>
+        <div class="paystub-row" onclick="togglePaystubRow(this)">
+          <div class="paystub-row-main">
+            <span class="paystub-row-name">State Income Tax (VA)</span>
+            <span class="paystub-row-amount">−$18.00</span>
+            <span class="paystub-expand-icon">▼</span>
+          </div>
+          <div class="paystub-explanation">Virginia income tax. Required by law. BB doesn't control this.</div>
+        </div>
+        <div class="paystub-row" onclick="togglePaystubRow(this)">
+          <div class="paystub-row-main">
+            <span class="paystub-row-name">Social Security</span>
+            <span class="paystub-row-amount">−$32.24</span>
+            <span class="paystub-expand-icon">▼</span>
+          </div>
+          <div class="paystub-explanation">6.2% of your gross pay. Goes toward your future Social Security retirement benefits.</div>
+        </div>
+        <div class="paystub-row" onclick="togglePaystubRow(this)">
+          <div class="paystub-row-main">
+            <span class="paystub-row-name">Medicare</span>
+            <span class="paystub-row-amount">−$7.54</span>
+            <span class="paystub-expand-icon">▼</span>
+          </div>
+          <div class="paystub-explanation">1.45% of your gross pay. Funds the Medicare program.</div>
+        </div>
+
+        <div class="paystub-section-label">Summary</div>
+
+        <div class="paystub-row net-row" onclick="togglePaystubRow(this)">
+          <div class="paystub-row-main">
+            <span class="paystub-row-name">Net Pay</span>
+            <span class="paystub-row-amount net-pay-amount highlight">$420.22</span>
+            <span class="paystub-expand-icon">▼</span>
+          </div>
+          <div class="paystub-explanation">What actually hits your account. The formula: Gross Pay − All Deductions = Net Pay.</div>
+        </div>
+      </div>
+
+      <div class="formula-card">
+        <div class="formula-card-accent"></div>
+        <div class="formula-card-body">
+          <div class="formula-text">Gross Pay <span class="op">−</span> All Deductions <span class="op">=</span> Net Pay</div>
+          <div class="formula-note">If net pay looks wrong, always start with gross pay. Did your hours get entered correctly? Then work down.</div>
+        </div>
+      </div>
+
+      <div class="quiz-block">
+        <div class="quiz-question">Sarah's gross pay is $480.00. Her total deductions are $87.50. What is her net pay?</div>
+        <div class="quiz-input-row">
+          <input type="text" class="quiz-input" id="s2-input" placeholder="$" aria-label="Enter Sarah's net pay">
+          <button class="quiz-btn" onclick="checkS2Quiz()">Check it</button>
+        </div>
+        <div class="quiz-feedback" id="s2-feedback"></div>
+      </div>
+
+      <div class="section-continue hidden" id="s2-continue">
+        <button class="btn-coral" onclick="completeSection(2)">Next: understanding PTO vs RTO →</button>
+      </div>
+      <button class="help-link" onclick="toggleHelp('help-2')">I need help with this</button>
+      <div class="help-panel" id="help-2">
+        <p>Here's who can help with understanding your pay stub.</p>
+        <p>If any of these line items look different on your actual stub, Alicia in payroll can walk you through them: alicia@brightbeginningsva.com</p>
+        <p>Or keep going — you can come back to this anytime.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 3 — PTO vs RTO -->
+    <div class="section" id="section-3" data-section="3">
+      <div class="eyebrow-pill">PTO vs. RTO</div>
+      <div class="situation-hook">
+        <p>"Your normal weekly gross is $560. This week it's $416. You didn't think you did anything differently. What happened?"</p>
+      </div>
+
+      <div class="comparison-grid">
+        <div class="compare-card pto">
+          <div class="compare-badge pto">PTO</div>
+          <div class="compare-title">Paid Time Off</div>
+          <div class="compare-body">Planned in advance. Approved by your director. You're paid your normal rate for those hours. Your Reliability Reward streak stays intact.</div>
+          <div class="compare-tags">✓ Paid at normal rate<br>✓ Streak stays<br>✓ Plan ahead &amp; request it</div>
+        </div>
+        <div class="compare-card rto">
+          <div class="compare-badge rto">RTO</div>
+          <div class="compare-title">Request for Time Off (unpaid)</div>
+          <div class="compare-body">Unplanned or unapproved absence. You are not paid for those hours. Your gross pay will be lower this period. Your Reliability Reward streak resets.</div>
+          <div class="compare-tags">✗ Hours not paid<br>✗ Streak resets<br>→ One unplanned day can change your check</div>
+        </div>
+      </div>
+
+      <div class="example-block">
+        <div class="example-tag">Example</div>
+        <p>You normally work 40 hours and earn $560 gross.</p>
+        <p>You took one unplanned sick day (8 hours RTO).</p>
+        <p>Your hours this period: <strong>32 hours</strong></p>
+        <p>Your gross pay this period: <strong>$448</strong> (not $560)</p>
+        <p>Difference: <strong>$112 less</strong> — not an error. That's the RTO.</p>
+      </div>
+
+      <div class="scenario-block">
+        <p class="body-copy" style="margin-bottom:16px;">For each situation below, tap whether it's PTO or RTO.</p>
+
+        <div class="scenario-item" id="scenario-1">
+          <div class="scenario-text">You requested Tuesday off two weeks ago. Your director approved it. You have the day off.</div>
+          <div class="scenario-btns">
+            <button class="scenario-btn" onclick="answerScenario(1,'PTO','PTO')">PTO</button>
+            <button class="scenario-btn" onclick="answerScenario(1,'RTO','PTO')">RTO</button>
+          </div>
+          <div class="scenario-feedback" id="scenario-feedback-1"></div>
+        </div>
+
+        <div class="scenario-item" id="scenario-2">
+          <div class="scenario-text">Your child is sick. You call out at 7am. You won't be in today.</div>
+          <div class="scenario-btns">
+            <button class="scenario-btn" onclick="answerScenario(2,'PTO','RTO')">PTO</button>
+            <button class="scenario-btn" onclick="answerScenario(2,'RTO','RTO')">RTO</button>
+          </div>
+          <div class="scenario-feedback" id="scenario-feedback-2"></div>
+        </div>
+
+        <div class="scenario-item" id="scenario-3">
+          <div class="scenario-text">You booked a dentist appointment and submitted a time-off request last Monday. It was approved.</div>
+          <div class="scenario-btns">
+            <button class="scenario-btn" onclick="answerScenario(3,'PTO','PTO')">PTO</button>
+            <button class="scenario-btn" onclick="answerScenario(3,'RTO','PTO')">RTO</button>
+          </div>
+          <div class="scenario-feedback" id="scenario-feedback-3"></div>
+        </div>
+      </div>
+
+      <div class="section-continue hidden" id="s3-continue">
+        <button class="btn-coral" onclick="completeSection(3)">You've got this. Next up: the Reliability Reward →</button>
+      </div>
+      <button class="help-link" onclick="toggleHelp('help-3')">I need help with this</button>
+      <div class="help-panel" id="help-3">
+        <p>Here's who can help with PTO and RTO questions.</p>
+        <p>Your director can help you submit a PTO request. For questions about how time off was coded on your check, contact Alicia: alicia@brightbeginningsva.com</p>
+        <p>Or keep going — you can come back to this anytime.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 4 — RELIABILITY REWARD -->
+    <div class="section" id="section-4" data-section="4">
+      <div class="eyebrow-pill">The Reliability Reward</div>
+      <div class="situation-hook">
+        <p>"You've worked every shift for six weeks straight. Then one Monday morning, your car won't start. You call out. What just happened to your streak?"</p>
+      </div>
+      <p class="body-copy">The Reliability Reward is BB's way of recognizing something that matters deeply — to the children, to your teammates, and to the families who count on consistency every single day.</p>
+
+      <div class="streak-tracker">
+        <div class="streak-days" id="streak-days">
+          <div class="day-circle complete" id="day-Mon"><span>✓</span><span class="day-label">Mon</span></div>
+          <div class="day-circle complete" id="day-Tue"><span>✓</span><span class="day-label">Tue</span></div>
+          <div class="day-circle complete" id="day-Wed"><span>✓</span><span class="day-label">Wed</span></div>
+          <div class="day-circle complete" id="day-Thu"><span>✓</span><span class="day-label">Thu</span></div>
+          <div class="day-circle complete" id="day-Fri"><span>✓</span><span class="day-label">Fri</span></div>
+        </div>
+        <div class="streak-status" id="streak-status">5/5 shifts — streak continues ✓</div>
+        <button class="streak-toggle-btn" id="streak-toggle" onclick="toggleStreak()">See what an RTO looks like</button>
+      </div>
+
+      <table class="streak-table">
+        <thead>
+          <tr><th>Action</th><th>Streak</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Show up for every scheduled shift</td><td class="streak-continues">Continues ✓</td></tr>
+          <tr><td>Take approved PTO</td><td class="streak-continues">Continues ✓</td></tr>
+          <tr><td>Have an unplanned absence (RTO)</td><td class="streak-resets">Resets ✗</td></tr>
+          <tr><td>Call out sick without prior approval</td><td class="streak-resets">Resets ✗</td></tr>
+        </tbody>
+      </table>
+
+      <div class="why-callout">
+        <p>"If you know you need time off — plan ahead. Submit a PTO request, get it approved, and your streak stays intact. That's all it takes."</p>
+      </div>
+
+      <div class="reflection-block">
+        <div class="reflection-q">Think about the last time you needed unexpected time off. With what you know now, what's one thing you could do differently next time?</div>
+        <div class="reflection-note">Just for you — not submitted anywhere.</div>
+        <textarea class="reflection-textarea" id="reflection-input" placeholder="Take a moment to think…" aria-label="Your reflection — private, not submitted"></textarea>
+      </div>
+
+      <div class="section-continue">
+        <button class="btn-coral" onclick="completeSection(4)">I've thought about it →</button>
+      </div>
+      <button class="help-link" onclick="toggleHelp('help-4')">I need help with this</button>
+      <div class="help-panel" id="help-4">
+        <p>Here's who can help with the Reliability Reward and how it applies to your schedule.</p>
+        <p>Your director can explain how the streak is tracked at your site. For paycheck questions about how it shows up in your pay, contact Alicia: alicia@brightbeginningsva.com</p>
+        <p>Or keep going — you can come back to this anytime.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 5 — DEDUCTIONS -->
+    <div class="section print-section" id="section-5" data-section="5">
+      <div class="eyebrow-pill">Your Deductions</div>
+      <p class="body-copy">Some of the lines on your pay stub can feel mysterious — especially the tax deductions. Here's what each one actually is, and who controls it.</p>
+
+      <div class="deductions-grid">
+        <div class="deduction-column gov-col">
+          <div class="deduction-col-header" style="background:var(--sky-dk);">Government requires this</div>
+          <div class="deduction-item">
+            <div class="deduction-item-name">Federal Income Tax</div>
+            <div class="deduction-item-desc">Funds national programs. Amount based on your W-4 filing.</div>
+          </div>
+          <div class="deduction-item">
+            <div class="deduction-item-name">State Income Tax (VA)</div>
+            <div class="deduction-item-desc">Funds Virginia programs.</div>
+          </div>
+          <div class="deduction-item">
+            <div class="deduction-item-name">Social Security (6.2%)</div>
+            <div class="deduction-item-desc">Builds toward your own retirement benefits.</div>
+          </div>
+          <div class="deduction-item">
+            <div class="deduction-item-name">Medicare (1.45%)</div>
+            <div class="deduction-item-desc">Funds healthcare for seniors.</div>
+          </div>
+          <div class="deduction-footer">These are legal requirements. BB has no control over them.</div>
+        </div>
+        <div class="deduction-column bb-col">
+          <div class="deduction-col-header" style="background:var(--yellow-dk);">BB can affect this</div>
+          <div class="deduction-item">
+            <div class="deduction-item-name">Hours entered correctly</div>
+            <div class="deduction-item-desc">BB enters your hours. Always worth checking.</div>
+          </div>
+          <div class="deduction-item">
+            <div class="deduction-item-name">PTO/RTO coding</div>
+            <div class="deduction-item-desc">Was your time off coded as PTO or RTO?</div>
+          </div>
+          <div class="deduction-item">
+            <div class="deduction-item-name">Voluntary deductions</div>
+            <div class="deduction-item-desc">Health insurance or other elected benefits, if applicable.</div>
+          </div>
+          <div class="deduction-footer">If something looks wrong here, it's worth a conversation.</div>
+        </div>
+      </div>
+
+      <div class="quick-ref-card" id="quick-ref">
+        <div class="quick-ref-accent"></div>
+        <div class="quick-ref-body">
+          <div class="quick-ref-title">Payday checklist</div>
+          <div class="quick-ref-item"><div class="check-circle">✓</div><span>Check gross pay — do my hours look right?</span></div>
+          <div class="quick-ref-item"><div class="check-circle">✓</div><span>Check PTO/RTO — any time off this period?</span></div>
+          <div class="quick-ref-item"><div class="check-circle">✓</div><span>Check deductions — anything new or changed?</span></div>
+          <div class="quick-ref-item"><div class="check-circle">✓</div><span>Net pay = Gross − All Deductions ✓</span></div>
+        </div>
+        <div class="quick-ref-footer">
+          <span class="quick-ref-footer-note">Save this — it'll be here whenever you need it.</span>
+          <button class="copy-link" onclick="copyChecklist()">Copy checklist</button>
+        </div>
+      </div>
+
+      <!-- Matching interaction -->
+      <div class="matching-block">
+        <p style="font-size:15px;font-weight:700;color:var(--charcoal);margin-bottom:8px;">Sort the deductions</p>
+        <p class="matching-instructions">Tap a deduction label to select it, then tap the bucket it belongs in. On desktop you can also drag and drop.</p>
+
+        <div class="matching-items" id="matching-chips">
+          <div class="match-chip" tabindex="0" draggable="true" data-item="Federal Income Tax" onclick="selectChip(this)" onkeydown="chipKeydown(event,this)" ondragstart="dragStart(event)">Federal Income Tax</div>
+          <div class="match-chip" tabindex="0" draggable="true" data-item="Social Security" onclick="selectChip(this)" onkeydown="chipKeydown(event,this)" ondragstart="dragStart(event)">Social Security</div>
+          <div class="match-chip" tabindex="0" draggable="true" data-item="Hours Entered" onclick="selectChip(this)" onkeydown="chipKeydown(event,this)" ondragstart="dragStart(event)">Hours Entered</div>
+          <div class="match-chip" tabindex="0" draggable="true" data-item="PTO Coding" onclick="selectChip(this)" onkeydown="chipKeydown(event,this)" ondragstart="dragStart(event)">PTO Coding</div>
+          <div class="match-chip" tabindex="0" draggable="true" data-item="Medicare" onclick="selectChip(this)" onkeydown="chipKeydown(event,this)" ondragstart="dragStart(event)">Medicare</div>
+        </div>
+
+        <div class="matching-buckets">
+          <div class="match-bucket" tabindex="0" data-bucket="gov" onclick="assignToBucket('gov')" onkeydown="bucketKeydown(event,'gov')" ondragover="dragOver(event)" ondrop="dropOnBucket(event,'gov')">
+            <div class="match-bucket-label">Government requires it</div>
+            <div class="bucket-placed" id="bucket-gov"></div>
+          </div>
+          <div class="match-bucket" tabindex="0" data-bucket="bb" onclick="assignToBucket('bb')" onkeydown="bucketKeydown(event,'bb')" ondragover="dragOver(event)" ondrop="dropOnBucket(event,'bb')">
+            <div class="match-bucket-label">BB can affect it</div>
+            <div class="bucket-placed" id="bucket-bb"></div>
+          </div>
+        </div>
+
+        <div class="matching-feedback" id="matching-feedback"></div>
+      </div>
+
+      <div class="section-continue hidden" id="s5-continue">
+        <button class="btn-coral" onclick="completeSection(5)">You've got the full picture. Last section →</button>
+      </div>
+      <button class="help-link" onclick="toggleHelp('help-5')">I need help with this</button>
+      <div class="help-panel" id="help-5">
+        <p>Here's who can help with deductions questions.</p>
+        <p>For questions about your tax withholdings (W-4), a tax professional or HR can help. For questions about how your pay was calculated, contact Alicia: alicia@brightbeginningsva.com</p>
+        <p>Or keep going — you can come back to this anytime.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 6 — IF SOMETHING LOOKS WRONG -->
+    <div class="section" id="section-6" data-section="6">
+      <div class="eyebrow-pill">If Something Looks Wrong</div>
+      <div class="situation-hook">
+        <p>"You've checked your hours. You've checked your PTO. It still doesn't add up. Now what?"</p>
+      </div>
+
+      <div class="steps-flow">
+        <div class="step-item">
+          <div class="step-connector">
+            <div class="step-circle c1">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Check your hours in your timekeeping system.</div>
+            <div class="step-sub">Log in and confirm your hours for the pay period match what you actually worked.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-connector">
+            <div class="step-circle c2">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Check your PTO/RTO record.</div>
+            <div class="step-sub">Did you have any planned or unplanned time off? Was it coded correctly?</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-connector">
+            <div class="step-circle c3">3</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">If it still doesn't add up — contact Alicia.</div>
+            <div class="step-sub">Come prepared with the specific difference you noticed.</div>
+            <div class="alicia-card">
+              <div class="alicia-header">
+                <div class="alicia-name">Alicia</div>
+                <div class="alicia-role">Payroll</div>
+              </div>
+              <div class="alicia-body">
+                <div class="alicia-email">alicia@brightbeginningsva.com</div>
+                <div class="alicia-template" id="alicia-template-text">"Hi Alicia, I have a question about my paycheck for [pay period]. My gross pay shows [X] but I expected [Y]. Can you help me understand the difference?"</div>
+                <button class="btn-coral-outline" onclick="copyTemplate()">Copy message template</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="what-not-todo">
+        <p>Don't assume it's an error until you've checked your hours and PTO.</p>
+        <p>Don't wait — payroll questions should be raised within one pay period.</p>
+        <p>Don't ask your coworkers — they don't have access to your pay information.</p>
+      </div>
+
+      <!-- Capstone scenario -->
+      <p class="body-copy" style="font-weight:700;color:var(--charcoal);margin-bottom:16px;">Final practice — let's put it all together.</p>
+      <div class="capstone-scenario-card">
+        <p>Maria worked 38 regular hours this week. She took one unplanned sick day (8 hours).</p>
+        <p>Her hourly rate is $14.00. Her normal weekly gross is $560.</p>
+      </div>
+
+      <!-- Q1 -->
+      <div class="capstone-q active" id="cap-q1">
+        <div class="capstone-q-label">Question 1 of 4</div>
+        <div class="capstone-q-text">What is Maria's gross pay this week?</div>
+        <div class="quiz-input-row">
+          <input type="text" class="quiz-input" id="cap1-input" placeholder="$" aria-label="Maria's gross pay">
+          <button class="quiz-btn" onclick="checkCapQ1()">Check</button>
+        </div>
+        <div class="quiz-feedback" id="cap1-feedback"></div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="capstone-q" id="cap-q2">
+        <div class="capstone-q-label">Question 2 of 4</div>
+        <div class="capstone-q-text">Did Maria use PTO or RTO?</div>
+        <div class="capstone-tap-btns">
+          <button class="capstone-tap-btn" onclick="answerCapQ(2,'PTO','RTO',this)">PTO</button>
+          <button class="capstone-tap-btn" onclick="answerCapQ(2,'RTO','RTO',this)">RTO</button>
+        </div>
+        <div class="quiz-feedback" id="cap2-feedback"></div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="capstone-q" id="cap-q3">
+        <div class="capstone-q-label">Question 3 of 4</div>
+        <div class="capstone-q-text">What happened to Maria's Reliability Reward streak?</div>
+        <div class="capstone-tap-btns">
+          <button class="capstone-tap-btn" onclick="answerCapQ(3,'stayed','reset',this)">Stayed intact</button>
+          <button class="capstone-tap-btn" onclick="answerCapQ(3,'reset','reset',this)">Reset</button>
+        </div>
+        <div class="quiz-feedback" id="cap3-feedback"></div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="capstone-q" id="cap-q4">
+        <div class="capstone-q-label">Question 4 of 4</div>
+        <div class="capstone-q-text">What should Maria do if she's unsure why her pay looks different?</div>
+        <div class="capstone-tap-btns" style="flex-direction:column;max-width:360px;">
+          <button class="capstone-tap-btn" onclick="answerCapQ(4,'coworker','alicia',this)">Ask a coworker</button>
+          <button class="capstone-tap-btn" onclick="answerCapQ(4,'alicia','alicia',this)">Check hours then contact Alicia</button>
+          <button class="capstone-tap-btn" onclick="answerCapQ(4,'wait','alicia',this)">Wait and see</button>
+        </div>
+        <div class="quiz-feedback" id="cap4-feedback"></div>
+      </div>
+
+      <button class="help-link" onclick="toggleHelp('help-6')">I need help with this</button>
+      <div class="help-panel" id="help-6">
+        <p>Here's who can help if your pay looks wrong.</p>
+        <p>Follow the three steps above — check hours, check PTO/RTO, then contact Alicia. That's always the right path.</p>
+        <p>Or keep going — you can come back to this anytime.</p>
+      </div>
+    </div>
+
+  </div><!-- /module-content -->
+
+  <!-- MILESTONE SCREEN -->
+  <div id="milestone-card">
+    <div class="milestone-inner">
+      <div class="milestone-icon">
+        <svg class="milestone-star" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="var(--coral)" stroke="var(--coral)" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="milestone-title">Module 1 complete.</div>
+      <div class="milestone-sub">You now understand your pay stub, the difference between PTO and RTO, how your Reliability Reward works, and exactly what to do if something looks wrong.</div>
+      <div class="milestone-learned">
+        <div class="milestone-learned-title">What you've learned</div>
+        <div class="milestone-item"><div class="check-circle">✓</div><span>How to read every line on your pay stub</span></div>
+        <div class="milestone-item"><div class="check-circle">✓</div><span>The difference between PTO and RTO — and how each affects your pay</span></div>
+        <div class="milestone-item"><div class="check-circle">✓</div><span>How the Reliability Reward streak works and how to protect it</span></div>
+        <div class="milestone-item"><div class="check-circle">✓</div><span>Exactly who to contact and what to say if your pay looks wrong</span></div>
+      </div>
+      <button class="milestone-cta" onclick="saveQuickRef()">Save my Quick Reference Card</button>
+      <button class="milestone-review-link" onclick="reviewModule()">Review any section →</button>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ── STATE ──────────────────────────────────────────────────
+const STORAGE_KEY = 'bb_module1_progress';
+let progress = loadProgress();
+let streakShowingRTO = false;
+let selectedChip = null;
+let draggedItem = null;
+
+// Matching answers: correct bucket for each item
+const matchAnswers = {
+  'Federal Income Tax': 'gov',
+  'Social Security': 'gov',
+  'Medicare': 'gov',
+  'Hours Entered': 'bb',
+  'PTO Coding': 'bb'
+};
+let matchPlacements = {};
+let scenariosAnswered = { 1: false, 2: false, 3: false };
+let capstoneQ = 1;
+
+// ── PERSISTENCE ────────────────────────────────────────────
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return { completedSections: [], quizAnswers: {}, startedAt: null, completedAt: null };
+}
+
+function saveProgress() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  } catch(e) {}
+}
+
+// ── START MODULE ───────────────────────────────────────────
+function startModule() {
+  document.getElementById('cover-screen').style.display = 'none';
+  document.getElementById('progress-bar').classList.add('visible');
+  if (!progress.startedAt) {
+    progress.startedAt = new Date().toISOString();
+    saveProgress();
+  }
+  revealSection(1);
+  updateProgressBar();
+}
+
+// ── SECTION REVEAL ─────────────────────────────────────────
+function revealSection(n) {
+  const el = document.getElementById('section-' + n);
+  if (!el) return;
+  el.classList.add('revealed');
+  el.classList.remove('locked-placeholder');
+  setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+}
+
+function completeSection(n) {
+  if (!progress.completedSections.includes(n)) {
+    progress.completedSections.push(n);
+    saveProgress();
+  }
+  updateProgressBar();
+  if (n < 6) {
+    revealSection(n + 1);
+  }
+}
+
+// ── PROGRESS BAR ───────────────────────────────────────────
+function updateProgressBar() {
+  const count = progress.completedSections.length;
+  const pct = Math.round((count / 6) * 100);
+  document.getElementById('pb-fill').style.width = pct + '%';
+  document.getElementById('pb-label').textContent = 'You\'ve completed Step ' + count + ' of 6';
+
+  for (let i = 1; i <= 6; i++) {
+    const dot = document.getElementById('dot-' + i);
+    dot.classList.remove('completed', 'current');
+    if (progress.completedSections.includes(i)) {
+      dot.classList.add('completed');
+      dot.textContent = '✓';
+    } else if (i === count + 1) {
+      dot.classList.add('current');
+      dot.textContent = i;
+    } else {
+      dot.textContent = i;
+    }
+  }
+}
+
+// ── RESTORE STATE ON LOAD ──────────────────────────────────
+function restoreState() {
+  if (progress.startedAt) {
+    document.getElementById('cover-screen').style.display = 'none';
+    document.getElementById('progress-bar').classList.add('visible');
+    updateProgressBar();
+    // Reveal all completed sections + next
+    const max = Math.max(...progress.completedSections, 0);
+    for (let i = 1; i <= max; i++) {
+      const el = document.getElementById('section-' + i);
+      if (el) el.classList.add('revealed');
+    }
+    if (max < 6) {
+      const next = document.getElementById('section-' + (max + 1));
+      if (next) next.classList.add('revealed');
+    }
+    // Restore section 2 quiz if completed
+    if (progress.completedSections.includes(2)) {
+      const cont = document.getElementById('s2-continue');
+      if (cont) cont.classList.remove('hidden');
+    }
+    // Restore section 3 scenarios
+    if (progress.completedSections.includes(3)) {
+      const cont = document.getElementById('s3-continue');
+      if (cont) cont.classList.remove('hidden');
+    }
+    // Restore section 5 matching
+    if (progress.completedSections.includes(5)) {
+      const cont = document.getElementById('s5-continue');
+      if (cont) cont.classList.remove('hidden');
+    }
+  }
+  if (progress.completedAt) {
+    document.getElementById('milestone-card').classList.add('visible');
+  }
+}
+
+// ── PAYSTUB ROWS ───────────────────────────────────────────
+function togglePaystubRow(row) {
+  row.classList.toggle('expanded');
+}
+
+// ── HELP PANELS ────────────────────────────────────────────
+function toggleHelp(id) {
+  const panel = document.getElementById(id);
+  panel.classList.toggle('open');
+}
+
+// ── SECTION 2 QUIZ ─────────────────────────────────────────
+function checkS2Quiz() {
+  const raw = document.getElementById('s2-input').value.replace(/[$,\s]/g, '');
+  const val = parseFloat(raw);
+  const fb = document.getElementById('s2-feedback');
+  fb.className = 'quiz-feedback';
+
+  if (Math.abs(val - 392.50) < 0.01) {
+    fb.className = 'quiz-feedback correct';
+    fb.innerHTML = '<strong>Great thinking.</strong> $480.00 − $87.50 = $392.50. That\'s exactly how every pay stub works.';
+    showS2Continue();
+  } else {
+    fb.className = 'quiz-feedback guided';
+    fb.innerHTML = 'Let\'s look at that together. Take Sarah\'s gross pay ($480.00) and subtract her deductions ($87.50). What do you get?<div class="hint-visual">$480.00 − $87.50 = ?</div>';
+  }
+}
+
+function showS2Continue() {
+  const cont = document.getElementById('s2-continue');
+  cont.classList.remove('hidden');
+  if (!progress.completedSections.includes(2)) {
+    progress.quizAnswers.s2 = true;
+    saveProgress();
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.activeElement === document.getElementById('s2-input')) {
+    checkS2Quiz();
+  }
+  if (e.key === 'Enter' && document.activeElement === document.getElementById('cap1-input')) {
+    checkCapQ1();
+  }
+});
+
+// ── SECTION 3 SCENARIOS ────────────────────────────────────
+function answerScenario(n, chosen, correct) {
+  if (scenariosAnswered[n]) return;
+  const fb = document.getElementById('scenario-feedback-' + n);
+  const btns = document.querySelectorAll('#scenario-' + n + ' .scenario-btn');
+  btns.forEach(b => b.disabled = true);
+
+  if (chosen === correct) {
+    fb.className = 'scenario-feedback correct';
+    fb.textContent = 'Exactly right.';
+    btns.forEach(b => { if (b.textContent === chosen) b.classList.add('selected-correct'); });
+    scenariosAnswered[n] = true;
+    checkAllScenarios();
+  } else {
+    fb.className = 'scenario-feedback guided';
+    fb.textContent = 'Let\'s think about that — was this planned and approved? The answer is ' + correct + '.';
+    btns.forEach(b => {
+      if (b.textContent === chosen) b.classList.add('selected-guided');
+      if (b.textContent === correct) b.classList.add('selected-correct');
+    });
+    scenariosAnswered[n] = true;
+    checkAllScenarios();
+  }
+}
+
+function checkAllScenarios() {
+  if (scenariosAnswered[1] && scenariosAnswered[2] && scenariosAnswered[3]) {
+    setTimeout(() => {
+      const cont = document.getElementById('s3-continue');
+      cont.classList.remove('hidden');
+      cont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 600);
+  }
+}
+
+// ── SECTION 4 — STREAK TOGGLE ──────────────────────────────
+function toggleStreak() {
+  streakShowingRTO = !streakShowingRTO;
+  const days = ['Mon','Tue','Wed','Thu','Fri'];
+  const status = document.getElementById('streak-status');
+  const btn = document.getElementById('streak-toggle');
+
+  if (streakShowingRTO) {
+    days.forEach((d, i) => {
+      const el = document.getElementById('day-' + d);
+      if (i < 4) {
+        el.className = 'day-circle complete';
+        el.innerHTML = '<span>✓</span><span class="day-label">' + d + '</span>';
+      } else {
+        el.className = 'day-circle rto-day';
+        el.innerHTML = '<span>✗</span><span class="day-label">' + d + '</span>';
+      }
+    });
+    status.textContent = 'Streak reset on Friday';
+    btn.textContent = 'See the full streak';
+  } else {
+    days.forEach(d => {
+      const el = document.getElementById('day-' + d);
+      el.className = 'day-circle complete';
+      el.innerHTML = '<span>✓</span><span class="day-label">' + d + '</span>';
+    });
+    status.textContent = '5/5 shifts — streak continues ✓';
+    btn.textContent = 'See what an RTO looks like';
+  }
+}
+
+// ── SECTION 5 — MATCHING ───────────────────────────────────
+function selectChip(chip) {
+  if (chip.classList.contains('placed-correct') || chip.classList.contains('placed-guided')) return;
+  if (selectedChip === chip) {
+    chip.classList.remove('selected');
+    selectedChip = null;
+    return;
+  }
+  if (selectedChip) selectedChip.classList.remove('selected');
+  chip.classList.add('selected');
+  selectedChip = chip;
+}
+
+function chipKeydown(e, chip) {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectChip(chip); }
+}
+
+function bucketKeydown(e, bucket) {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); assignToBucket(bucket); }
+}
+
+function assignToBucket(bucket) {
+  if (!selectedChip) return;
+  const item = selectedChip.dataset.item;
+  placeItem(item, bucket, selectedChip);
+  selectedChip = null;
+}
+
+function dragStart(e) {
+  draggedItem = e.target;
+  e.dataTransfer.setData('text/plain', e.target.dataset.item);
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('highlight');
+}
+
+function dropOnBucket(e, bucket) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('highlight');
+  if (!draggedItem) return;
+  const item = draggedItem.dataset.item;
+  placeItem(item, bucket, draggedItem);
+  draggedItem = null;
+}
+
+document.querySelectorAll('.match-bucket').forEach(b => {
+  b.addEventListener('dragleave', () => b.classList.remove('highlight'));
+});
+
+function placeItem(item, bucket, chipEl) {
+  if (matchPlacements[item]) return; // already placed
+  const correct = matchAnswers[item] === bucket;
+  matchPlacements[item] = { bucket, correct };
+
+  chipEl.classList.remove('selected');
+  chipEl.classList.add(correct ? 'placed-correct' : 'placed-guided');
+  chipEl.draggable = false;
+
+  const bucketEl = document.getElementById('bucket-' + bucket);
+  const tag = document.createElement('div');
+  tag.className = 'bucket-item ' + (correct ? 'correct' : 'guided');
+  tag.textContent = item;
+  bucketEl.appendChild(tag);
+
+  checkMatchingComplete();
+}
+
+function checkMatchingComplete() {
+  const total = Object.keys(matchAnswers).length;
+  const placed = Object.keys(matchPlacements).length;
+  if (placed < total) return;
+
+  const allCorrect = Object.values(matchPlacements).every(p => p.correct);
+  const fb = document.getElementById('matching-feedback');
+
+  if (allCorrect) {
+    fb.className = 'matching-feedback correct';
+    fb.textContent = 'You\'ve got the full picture now. One more section.';
+    showS5Continue();
+  } else {
+    fb.className = 'matching-feedback guided';
+    let msg = 'Let\'s review: ';
+    const wrongs = Object.entries(matchPlacements).filter(([,v]) => !v.correct);
+    wrongs.forEach(([item]) => {
+      const corr = matchAnswers[item] === 'gov' ? 'Government requires it' : 'BB can affect it';
+      msg += item + ' belongs in "' + corr + '". ';
+    });
+    msg += 'Feel free to try again on any you\'d like to revisit.';
+    fb.textContent = msg;
+    showS5Continue();
+  }
+}
+
+function showS5Continue() {
+  const cont = document.getElementById('s5-continue');
+  cont.classList.remove('hidden');
+}
+
+// ── SECTION 6 — CAPSTONE ───────────────────────────────────
+function checkCapQ1() {
+  const raw = document.getElementById('cap1-input').value.replace(/[$,\s]/g, '');
+  const val = parseFloat(raw);
+  const fb = document.getElementById('cap1-feedback');
+  fb.className = 'quiz-feedback';
+
+  if (Math.abs(val - 532) < 0.01) {
+    fb.className = 'quiz-feedback correct';
+    fb.textContent = 'Exactly — 38 hours × $14.00 = $532.';
+    advanceCap(2);
+  } else {
+    fb.className = 'quiz-feedback guided';
+    fb.innerHTML = 'Remember: only the hours she actually worked count. That\'s 38, not 40.<div class="hint-visual">38 hrs × $14.00 = ?</div>';
+  }
+}
+
+function answerCapQ(q, chosen, correct, btn) {
+  const fb = document.getElementById('cap' + q + '-feedback');
+  const allBtns = btn.parentElement.querySelectorAll('.capstone-tap-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    fb.className = 'quiz-feedback correct';
+    if (q === 2) fb.textContent = 'Right — it was unplanned, so it\'s RTO.';
+    if (q === 3) fb.textContent = 'Exactly — one unplanned absence resets the streak.';
+    if (q === 4) fb.textContent = 'That\'s exactly right. Check first, then reach out to Alicia with the specific difference.';
+    advanceCap(q + 1);
+  } else {
+    btn.classList.add('guided');
+    allBtns.forEach(b => { if (b.textContent.toLowerCase().includes(correct) || b.getAttribute('onclick').includes("'" + correct + "'")) b.classList.add('correct'); });
+    fb.className = 'quiz-feedback guided';
+    if (q === 2) fb.textContent = 'Think about whether it was planned and approved in advance.';
+    if (q === 3) fb.textContent = 'RTO always resets the streak — even one day.';
+    if (q === 4) fb.textContent = 'Coworkers can\'t see your pay. Waiting risks missing the correction window.';
+    advanceCap(q + 1);
+  }
+}
+
+function advanceCap(next) {
+  setTimeout(() => {
+    if (next <= 4) {
+      const el = document.getElementById('cap-q' + next);
+      if (el) {
+        el.classList.add('active');
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    } else {
+      // All done — trigger milestone
+      completeSection(6);
+      setTimeout(triggerMilestone, 600);
+    }
+  }, 800);
+}
+
+function triggerMilestone() {
+  progress.completedAt = new Date().toISOString();
+  saveProgress();
+  document.getElementById('milestone-card').classList.add('visible');
+}
+
+// ── COPY FUNCTIONS ─────────────────────────────────────────
+function copyChecklist() {
+  const text = `Payday checklist
+✓ Check gross pay — do my hours look right?
+✓ Check PTO/RTO — any time off this period?
+✓ Check deductions — anything new or changed?
+✓ Net pay = Gross − All Deductions ✓`;
+  copyToClipboard(text, 'Checklist copied!');
+}
+
+function copyTemplate() {
+  const text = 'Hi Alicia, I have a question about my paycheck for [pay period]. My gross pay shows [X] but I expected [Y]. Can you help me understand the difference?';
+  copyToClipboard(text, 'Template copied!');
+}
+
+function copyToClipboard(text, msg) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showCopyToast(msg)).catch(() => fallbackCopy(text, msg));
+  } else {
+    fallbackCopy(text, msg);
+  }
+}
+
+function fallbackCopy(text, msg) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showCopyToast(msg); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+function showCopyToast(msg) {
+  let toast = document.getElementById('copy-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'copy-toast';
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--charcoal);color:#fff;padding:10px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999;transition:opacity 400ms;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.style.opacity = '0', 2000);
+}
+
+// ── MILESTONE ACTIONS ──────────────────────────────────────
+function saveQuickRef() {
+  window.print();
+}
+
+function reviewModule() {
+  document.getElementById('milestone-card').classList.remove('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── INIT ───────────────────────────────────────────────────
+restoreState();
+</script>
+</body>
+</html>

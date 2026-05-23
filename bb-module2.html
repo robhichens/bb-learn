@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BB Learn — Module 2: Child Safety & Mandated Reporting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --coral:        #F08782;
+  --coral-soft:   #FAE8E7;
+  --coral-dk:     #C45E59;
+  --yellow:       #FFD437;
+  --yellow-soft:  #FFF8D6;
+  --yellow-dk:    #6d4c00;
+  --sky:          #AEDFE5;
+  --sky-soft:     #E8F7F9;
+  --sky-dk:       #2a7a82;
+  --mid-gray:     #A7A9AC;
+  --lt-gray:      #D1D2D4;
+  --dk-gray:      #6D6E71;
+  --charcoal:     #545454;
+  --cream:        #FAFAF5;
+  --white:        #FFFFFF;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--cream);
+  color: var(--charcoal);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* ── PROGRESS BAR ─────────────────────────────────────────── */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--white);
+  border-bottom: 1px solid var(--lt-gray);
+  padding: 10px 20px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+#progress-bar.visible { display: flex; }
+#pb-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dk-gray);
+  white-space: nowrap;
+  min-width: 160px;
+}
+#pb-track {
+  flex: 1;
+  height: 6px;
+  background: var(--lt-gray);
+  border-radius: 50px;
+  overflow: hidden;
+}
+#pb-fill {
+  height: 100%;
+  background: var(--coral);
+  border-radius: 50px;
+  width: 0%;
+  transition: width 600ms ease;
+}
+#pb-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  border: 2px solid var(--lt-gray);
+  background: var(--white);
+  color: var(--mid-gray);
+  transition: all 200ms;
+  cursor: default;
+}
+.step-dot.completed {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: var(--white);
+}
+.step-dot.current {
+  border-color: var(--coral);
+  color: var(--coral);
+  transform: scale(1.1);
+}
+
+/* ── MODULE CONTENT ───────────────────────────────────────── */
+#app { position: relative; }
+
+#module-content {
+  padding-top: 60px;
+  max-width: 560px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 80px;
+}
+
+.section {
+  margin-bottom: 60px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+  pointer-events: none;
+}
+.section.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+.section.locked-placeholder {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: none;
+}
+
+/* ── COVER SCREEN ─────────────────────────────────────────── */
+#cover-screen {
+  min-height: 100vh;
+  background: var(--charcoal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.cover-blob-coral {
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 340px; height: 340px;
+  background: var(--coral);
+  opacity: 0.10;
+  border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+}
+.cover-blob-yellow {
+  position: absolute;
+  bottom: -100px; left: -60px;
+  width: 300px; height: 300px;
+  background: var(--yellow);
+  opacity: 0.08;
+  border-radius: 40% 60% 30% 70% / 60% 40% 50% 50%;
+}
+.cover-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+  padding: 48px 32px;
+  text-align: center;
+}
+.cover-eyebrow {
+  display: inline-block;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 50px;
+  margin-bottom: 28px;
+}
+.cover-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+.cover-subtitle {
+  font-size: 16px;
+  color: rgba(255,255,255,0.60);
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+.cover-who {
+  font-size: 13px;
+  color: rgba(255,255,255,0.40);
+  margin-bottom: 40px;
+}
+.btn-start {
+  display: inline-block;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  min-height: 44px;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  font-family: 'Inter', sans-serif;
+}
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(240,135,130,0.40);
+}
+.btn-start:focus {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+
+/* ── SHARED COMPONENTS ────────────────────────────────────── */
+.eyebrow-pill {
+  display: inline-block;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+}
+
+.situation-hook {
+  background: var(--yellow-soft);
+  border-left: 4px solid var(--yellow);
+  border-radius: 0 16px 16px 0;
+  padding: 24px 24px 24px 20px;
+  margin-bottom: 28px;
+}
+.situation-hook p {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--charcoal);
+  line-height: 1.5;
+}
+
+.body-copy {
+  font-size: 15px;
+  color: var(--dk-gray);
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+.body-copy strong { color: var(--charcoal); }
+
+.sky-callout {
+  background: var(--sky-soft);
+  border-left: 4px solid var(--sky);
+  border-radius: 0 12px 12px 0;
+  padding: 18px 20px 18px 16px;
+  margin-bottom: 28px;
+}
+.sky-callout-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sky-dk);
+  margin-bottom: 6px;
+}
+.sky-callout p {
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+}
+.sky-callout p strong { color: var(--charcoal); }
+
+.yellow-callout {
+  background: var(--yellow-soft);
+  border-left: 4px solid var(--yellow);
+  border-radius: 0 12px 12px 0;
+  padding: 18px 20px 18px 16px;
+  margin-bottom: 28px;
+}
+.yellow-callout-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--yellow-dk);
+  margin-bottom: 6px;
+}
+.yellow-callout p {
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+}
+.yellow-callout p strong { color: var(--charcoal); }
+
+.btn-coral {
+  display: inline-block;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 28px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  min-height: 44px;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  font-family: 'Inter', sans-serif;
+}
+.btn-coral:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(240,135,130,0.40);
+}
+.btn-coral:focus {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+.btn-coral:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-coral-outline {
+  display: inline-block;
+  background: transparent;
+  color: var(--coral);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 50px;
+  border: 2px solid var(--coral);
+  cursor: pointer;
+  min-height: 44px;
+  transition: transform 200ms ease, background 200ms ease;
+  font-family: 'Inter', sans-serif;
+}
+.btn-coral-outline:hover {
+  transform: translateY(-2px);
+  background: var(--coral-soft);
+}
+.btn-coral-outline:focus {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+
+.section-continue { margin-top: 32px; }
+
+.help-link {
+  display: block;
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--mid-gray);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+}
+.help-link:hover { text-decoration: underline; }
+.help-link:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+
+.help-panel {
+  display: none;
+  background: var(--sky-soft);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+}
+.help-panel.open { display: block; }
+.help-panel p { margin-bottom: 8px; }
+.help-panel p:last-child { margin-bottom: 0; font-style: italic; color: var(--mid-gray); font-size: 13px; }
+
+.locked-msg {
+  text-align: center;
+  padding: 24px;
+  font-size: 13px;
+  color: var(--mid-gray);
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px dashed var(--lt-gray);
+}
+
+/* ── ACCORDION ────────────────────────────────────────────── */
+.accordion {
+  margin-bottom: 28px;
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  overflow: hidden;
+  background: var(--white);
+}
+.accordion-item {
+  border-bottom: 1px solid var(--lt-gray);
+}
+.accordion-item:last-child { border-bottom: none; }
+.accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--charcoal);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+  min-height: 44px;
+  transition: background 150ms;
+  gap: 12px;
+}
+.accordion-trigger:hover { background: var(--cream); }
+.accordion-trigger:focus { outline: 2px solid var(--coral); outline-offset: -2px; }
+.accordion-icon {
+  font-size: 12px;
+  color: var(--mid-gray);
+  transition: transform 300ms ease;
+  flex-shrink: 0;
+}
+.accordion-item.open .accordion-icon { transform: rotate(180deg); }
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 300ms ease, opacity 300ms ease;
+  padding: 0 20px;
+}
+.accordion-item.open .accordion-body {
+  max-height: 400px;
+  opacity: 1;
+  padding: 0 20px 18px;
+}
+.accordion-body p {
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+}
+
+/* ── TABS ─────────────────────────────────────────────────── */
+.tabs-wrap { margin-bottom: 28px; }
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 8px 16px;
+  border-radius: 50px;
+  border: 1.5px solid var(--lt-gray);
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dk-gray);
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 36px;
+  transition: all 150ms;
+  font-family: 'Inter', sans-serif;
+}
+.tab-btn:hover { border-color: var(--coral); color: var(--coral); }
+.tab-btn:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+.tab-btn.active {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: var(--white);
+}
+.tab-panel {
+  display: none;
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  padding: 22px;
+  transition: opacity 150ms;
+}
+.tab-panel.active { display: block; }
+.tab-panel-badge {
+  display: inline-block;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 50px;
+  margin-bottom: 16px;
+}
+.tab-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mid-gray);
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+.tab-section-label:first-of-type { margin-top: 0; }
+.tab-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 6px;
+}
+.tab-list li {
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+  padding: 3px 0 3px 16px;
+  position: relative;
+}
+.tab-list li::before {
+  content: '·';
+  position: absolute;
+  left: 4px;
+  color: var(--coral);
+  font-weight: 700;
+}
+.tab-list li em { color: var(--sky-dk); font-style: italic; }
+.tab-note {
+  font-size: 13px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+  background: var(--cream);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 4px;
+}
+
+/* ── DECISION SCENARIOS ───────────────────────────────────── */
+.decision-block { margin-bottom: 24px; }
+.decision-card {
+  background: var(--white);
+  border-radius: 14px;
+  border: 1.5px solid var(--lt-gray);
+  padding: 18px 18px 14px;
+  margin-bottom: 14px;
+  transition: border-color 200ms;
+}
+.decision-card.answered { border-color: var(--lt-gray); }
+.decision-text {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--charcoal);
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+.decision-btns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.decision-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1.5px solid var(--lt-gray);
+  background: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  min-height: 44px;
+  transition: all 150ms;
+  color: var(--charcoal);
+}
+.decision-btn:hover { border-color: var(--coral); color: var(--coral); }
+.decision-btn:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+.decision-btn.selected-report {
+  background: var(--yellow-soft);
+  border-color: var(--yellow);
+  color: var(--yellow-dk);
+}
+.decision-btn.selected-watch {
+  background: var(--sky-soft);
+  border-color: var(--sky);
+  color: var(--sky-dk);
+}
+.decision-btn:disabled { cursor: default; }
+.decision-feedback {
+  margin-top: 10px;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: none;
+  line-height: 1.6;
+}
+.decision-feedback.report {
+  display: block;
+  background: var(--yellow-soft);
+  color: var(--yellow-dk);
+}
+.decision-feedback.watch {
+  display: block;
+  background: var(--sky-soft);
+  color: var(--sky-dk);
+}
+
+/* ── STEP FLOW ────────────────────────────────────────────── */
+.steps-flow {
+  margin-bottom: 28px;
+  position: relative;
+}
+.step-item {
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+.step-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.step-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+  flex-shrink: 0;
+}
+.step-circle.s-coral { background: var(--coral); }
+.step-circle.s-charcoal { background: var(--charcoal); }
+.step-circle.s-sky { background: var(--sky-dk); }
+.step-line {
+  width: 2px;
+  flex: 1;
+  background: var(--lt-gray);
+  min-height: 24px;
+  margin: 4px 0;
+}
+.step-content {
+  flex: 1;
+  padding-bottom: 28px;
+}
+.step-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 4px;
+  padding-top: 8px;
+}
+.step-sub {
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+}
+
+/* CPS Contact Card */
+.cps-card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  overflow: hidden;
+  margin-top: 14px;
+  margin-bottom: 8px;
+}
+.cps-card-header {
+  background: var(--coral-soft);
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--lt-gray);
+}
+.cps-card-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 2px;
+}
+.cps-card-hours {
+  font-size: 12px;
+  color: var(--dk-gray);
+}
+.cps-card-body { padding: 16px 18px; }
+.cps-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--charcoal);
+  letter-spacing: 0.02em;
+  margin-bottom: 14px;
+}
+.cps-card-btns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.cps-what-ready {
+  background: var(--cream);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--lt-gray);
+}
+.cps-what-ready-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dk-gray);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+  min-height: 40px;
+}
+.cps-what-ready-trigger:focus { outline: 2px solid var(--coral); outline-offset: -2px; }
+.cps-what-ready-icon {
+  font-size: 11px;
+  color: var(--mid-gray);
+  transition: transform 200ms;
+}
+.cps-what-ready.open .cps-what-ready-icon { transform: rotate(180deg); }
+.cps-what-ready-body {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 300ms ease, opacity 300ms ease;
+}
+.cps-what-ready.open .cps-what-ready-body {
+  max-height: 300px;
+  opacity: 1;
+  padding: 0 14px 12px;
+}
+.cps-what-ready-body ul {
+  list-style: none;
+  padding: 0;
+}
+.cps-what-ready-body li {
+  font-size: 13px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+  padding: 2px 0 2px 14px;
+  position: relative;
+}
+.cps-what-ready-body li::before {
+  content: '·';
+  position: absolute;
+  left: 2px;
+  color: var(--coral);
+  font-weight: 700;
+}
+
+.script-card {
+  background: var(--sky-soft);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-top: 14px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--dk-gray);
+  line-height: 1.7;
+  position: relative;
+}
+.script-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sky-dk);
+  margin-bottom: 6px;
+  font-style: normal;
+}
+.script-copy-btn {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--sky-dk);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  text-decoration: underline;
+  font-style: normal;
+}
+.script-copy-btn:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+
+.what-not-card {
+  background: var(--sky-soft);
+  border-left: 4px solid var(--sky);
+  border-radius: 0 12px 12px 0;
+  padding: 16px 18px 16px 16px;
+  margin-bottom: 28px;
+}
+.what-not-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sky-dk);
+  margin-bottom: 10px;
+}
+.what-not-card ul { list-style: none; padding: 0; }
+.what-not-card li {
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+  padding: 3px 0 3px 16px;
+  position: relative;
+}
+.what-not-card li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--sky-dk);
+}
+
+/* ── TIMELINE CARDS ───────────────────────────────────────── */
+.timeline-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -20px;
+  padding: 0 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--lt-gray) transparent;
+  margin-bottom: 28px;
+}
+.timeline-inner {
+  display: flex;
+  gap: 14px;
+  padding-bottom: 8px;
+  min-width: max-content;
+}
+@media (min-width: 560px) {
+  .timeline-wrap { overflow-x: visible; margin: 0; padding: 0; }
+  .timeline-inner { flex-wrap: wrap; min-width: unset; }
+  .timeline-card { width: calc(50% - 7px) !important; min-width: unset !important; }
+}
+.timeline-card {
+  min-width: 240px;
+  width: 240px;
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  padding: 20px;
+  flex-shrink: 0;
+}
+.timeline-card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 8px;
+}
+.timeline-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.timeline-card p {
+  font-size: 13px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+}
+
+/* ── TRUE/FALSE QUIZ ──────────────────────────────────────── */
+.tf-block {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  padding: 22px;
+  margin-bottom: 24px;
+}
+.tf-question {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--charcoal);
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+.tf-btns {
+  display: flex;
+  gap: 10px;
+}
+.tf-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--lt-gray);
+  background: var(--white);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  min-height: 44px;
+  transition: all 150ms;
+  color: var(--charcoal);
+}
+.tf-btn:hover { border-color: var(--coral); color: var(--coral); }
+.tf-btn:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+.tf-btn.correct { background: var(--yellow-soft); border-color: var(--yellow); color: var(--yellow-dk); }
+.tf-btn.guided { background: var(--sky-soft); border-color: var(--sky); color: var(--sky-dk); }
+.tf-btn:disabled { cursor: default; }
+.tf-feedback {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.7;
+  display: none;
+}
+.tf-feedback.correct { display: block; background: var(--yellow-soft); color: var(--yellow-dk); }
+.tf-feedback.guided { display: block; background: var(--sky-soft); color: var(--sky-dk); }
+
+/* ── BB PROTOCOL CARD ─────────────────────────────────────── */
+.protocol-card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.protocol-card-accent { height: 4px; background: var(--coral); }
+.protocol-card-body { padding: 22px; }
+.protocol-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 18px;
+}
+.protocol-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.protocol-step:last-of-type { margin-bottom: 18px; }
+.protocol-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.protocol-step-text {
+  font-size: 14px;
+  color: var(--dk-gray);
+  line-height: 1.7;
+}
+.protocol-step-text strong { color: var(--charcoal); }
+.protocol-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--lt-gray);
+  padding: 12px 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.protocol-footer-note {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--mid-gray);
+}
+
+/* ── CAPSTONE ─────────────────────────────────────────────── */
+.capstone-scenario-hook {
+  background: var(--yellow-soft);
+  border-left: 4px solid var(--yellow);
+  border-radius: 0 12px 12px 0;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+}
+.capstone-scenario-hook p {
+  font-size: 14px;
+  color: var(--charcoal);
+  line-height: 1.7;
+}
+.capstone-q {
+  background: var(--white);
+  border-radius: 16px;
+  border: 0.5px solid var(--lt-gray);
+  padding: 22px;
+  margin-bottom: 16px;
+  display: none;
+}
+.capstone-q.active { display: block; }
+.capstone-q-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 8px;
+}
+.capstone-q-text {
+  font-size: 15px;
+  color: var(--charcoal);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.capstone-tap-btns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.capstone-tap-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1.5px solid var(--lt-gray);
+  background: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  min-height: 44px;
+  color: var(--charcoal);
+  transition: all 150ms;
+  text-align: left;
+}
+.capstone-tap-btn:hover { border-color: var(--coral); color: var(--coral); }
+.capstone-tap-btn:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+.capstone-tap-btn.correct { background: var(--yellow-soft); border-color: var(--yellow); color: var(--yellow-dk); }
+.capstone-tap-btn.guided { background: var(--sky-soft); border-color: var(--sky); color: var(--sky-dk); }
+.capstone-tap-btn:disabled { cursor: default; }
+.capstone-feedback {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.7;
+  display: none;
+}
+.capstone-feedback.correct { display: block; background: var(--yellow-soft); color: var(--yellow-dk); }
+.capstone-feedback.guided { display: block; background: var(--sky-soft); color: var(--sky-dk); }
+
+/* ── MILESTONE SCREEN ─────────────────────────────────────── */
+#milestone-card {
+  display: none;
+  min-height: 100vh;
+  background: var(--yellow);
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 200;
+  overflow-y: auto;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+#milestone-card.visible { display: flex; }
+.milestone-inner {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+.milestone-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+}
+.milestone-star {
+  width: 36px;
+  height: 36px;
+  color: var(--coral);
+}
+.milestone-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 16px;
+}
+.milestone-sub {
+  font-size: 15px;
+  color: var(--yellow-dk);
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+.milestone-learned {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+.milestone-learned-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dk-gray);
+  margin-bottom: 14px;
+}
+.milestone-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--charcoal);
+  line-height: 1.6;
+}
+.milestone-item:last-child { margin-bottom: 0; }
+.check-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--coral);
+  color: var(--white);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-weight: 700;
+}
+.milestone-cta {
+  background: var(--charcoal);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 32px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  min-height: 44px;
+  font-family: 'Inter', sans-serif;
+  transition: transform 200ms ease;
+  margin-bottom: 16px;
+  display: block;
+  width: 100%;
+}
+.milestone-cta:hover { transform: translateY(-2px); }
+.milestone-cta:focus { outline: 2px solid var(--charcoal); outline-offset: 2px; }
+.milestone-review-link {
+  font-size: 13px;
+  color: var(--coral);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  text-decoration: underline;
+}
+.milestone-review-link:focus { outline: 2px solid var(--coral); outline-offset: 2px; }
+
+/* ── PRINT ────────────────────────────────────────────────── */
+@media print {
+  body > #app > #cover-screen,
+  #progress-bar,
+  .section:not(.print-section),
+  #milestone-card { display: none !important; }
+  .print-section { display: block !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* ── UTILITIES ────────────────────────────────────────────── */
+.hidden { display: none !important; }
+.mt8 { margin-top: 8px; }
+.mt16 { margin-top: 16px; }
+.mt24 { margin-top: 24px; }
+.mb8 { margin-bottom: 8px; }
+.mb16 { margin-bottom: 16px; }
+.mb28 { margin-bottom: 28px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- COVER SCREEN -->
+  <div id="cover-screen">
+    <div class="cover-blob-coral"></div>
+    <div class="cover-blob-yellow"></div>
+    <div class="cover-inner">
+      <div class="cover-eyebrow">Module 2 · Child Safety</div>
+      <h1 class="cover-title">A child in your classroom is showing signs that worry you. Do you know what to do next?</h1>
+      <p class="cover-subtitle">By the end of this module, you'll know exactly what to look for, when to act, and how — with no second-guessing.</p>
+      <p class="cover-who">Required for all BB staff — teachers, assistants, floaters, and site admins.</p>
+      <button class="btn-start" onclick="startModule()">Start Module 2 →</button>
+    </div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div id="progress-bar">
+    <div id="pb-label">You've completed Step 0 of 6</div>
+    <div id="pb-track"><div id="pb-fill"></div></div>
+    <div id="pb-dots">
+      <div class="step-dot current" id="dot-1">1</div>
+      <div class="step-dot" id="dot-2">2</div>
+      <div class="step-dot" id="dot-3">3</div>
+      <div class="step-dot" id="dot-4">4</div>
+      <div class="step-dot" id="dot-5">5</div>
+      <div class="step-dot" id="dot-6">6</div>
+    </div>
+  </div>
+
+  <!-- MODULE CONTENT -->
+  <div id="module-content">
+
+    <!-- SECTION 1 — YOU ARE A MANDATED REPORTER -->
+    <div class="section" id="section-1" data-section="1">
+      <div class="eyebrow-pill">Your Legal Role</div>
+
+      <div class="situation-hook">
+        <p>"A parent drops off a child with unexplained bruising on their arms. The child seems withdrawn. You're not sure if it's anything. You don't want to get anyone in trouble. You don't say anything. Under Virginia law, that silence has consequences."</p>
+      </div>
+
+      <p class="body-copy">Working with children is one of the most trusted roles in any community. Part of that trust — and part of your legal responsibility — is knowing when a child needs protection.</p>
+      <p class="body-copy">In Virginia, every childcare worker, teacher, and assistant is a mandated reporter. That's not a BB policy. It's state law: <strong>Code of Virginia § 63.2-1509.</strong></p>
+      <p class="body-copy">Being a mandated reporter means one thing: if you reasonably suspect that a child has been abused or neglected, you are required by law to report it. Not investigate it. Not prove it. Report it.</p>
+
+      <div class="sky-callout">
+        <div class="sky-callout-label">The standard that matters</div>
+        <p>You do not need proof. You do not need to be certain. You need <strong>reasonable suspicion</strong> — a genuine concern based on what you've seen or heard. The investigation is CPS's job, not yours.</p>
+      </div>
+
+      <p class="body-copy" style="font-weight:700;color:var(--charcoal);margin-bottom:14px;">Three common fears — and what the law actually says.</p>
+
+      <div class="accordion" id="s1-accordion">
+        <div class="accordion-item" id="acc-1">
+          <button class="accordion-trigger" onclick="toggleAccordion('acc-1')" aria-expanded="false">
+            <span>"What if I'm wrong?"</span>
+            <span class="accordion-icon">▼</span>
+          </button>
+          <div class="accordion-body">
+            <p>Good-faith reporters are legally protected. If you report honestly based on what you observed, you cannot be fired, sued, or penalized — even if the report is not confirmed. The law protects people who act in good faith.</p>
+          </div>
+        </div>
+        <div class="accordion-item" id="acc-2">
+          <button class="accordion-trigger" onclick="toggleAccordion('acc-2')" aria-expanded="false">
+            <span>"What if it affects the family?"</span>
+            <span class="accordion-icon">▼</span>
+          </button>
+          <div class="accordion-body">
+            <p>Your job is to report what you observed. CPS determines what happens next. Families who need support get connected to services. That process can only start if someone speaks up.</p>
+          </div>
+        </div>
+        <div class="accordion-item" id="acc-3">
+          <button class="accordion-trigger" onclick="toggleAccordion('acc-3')" aria-expanded="false">
+            <span>"What if my director disagrees?"</span>
+            <span class="accordion-icon">▼</span>
+          </button>
+          <div class="accordion-body">
+            <p>Your reporting obligation is personal — it belongs to you, not to BB as a company. Even if a director asks you not to report, your legal obligation remains. You report, then notify your director.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-continue">
+        <button class="btn-coral" onclick="completeSection(1)">I understand my role — show me what to look for →</button>
+      </div>
+      <button class="help-link" onclick="toggleHelp('help-1')">I need help with this</button>
+      <div class="help-panel" id="help-1">
+        <p>Questions about your role as a mandated reporter? Talk to your director or call the CPS hotline for guidance: 1-800-552-7096.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 2 — RECOGNIZING SIGNS OF CONCERN -->
+    <div class="section" id="section-2" data-section="2">
+      <div class="eyebrow-pill">What to Look For</div>
+
+      <p class="body-copy">You don't need to be a social worker to recognize the signs. You just need to know what's normal — and what's worth noticing.</p>
+      <p class="body-copy">The signs below don't always mean abuse or neglect. But they are worth taking seriously, documenting, and — if they persist or combine — reporting.</p>
+
+      <div class="tabs-wrap">
+        <div class="tab-bar" role="tablist" aria-label="Types of abuse and neglect">
+          <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-physical" onclick="switchTab('physical')">Physical Abuse</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-neglect" onclick="switchTab('neglect')">Neglect</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-emotional" onclick="switchTab('emotional')">Emotional Abuse</button>
+          <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-sexual" onclick="switchTab('sexual')">Sexual Abuse</button>
+        </div>
+
+        <!-- Physical Abuse -->
+        <div class="tab-panel active" id="tab-physical" role="tabpanel">
+          <div class="tab-panel-badge">Physical Abuse</div>
+          <div class="tab-section-label">Observable signs</div>
+          <ul class="tab-list">
+            <li>Unexplained bruises, burns, cuts, or welts</li>
+            <li>Bruising in unusual locations: torso, back, ears, neck, face (bruising on shins and knees is typical in toddlers — other locations are not)</li>
+            <li>Patterned marks that suggest an object (cord, belt buckle, hand)</li>
+            <li>Injuries inconsistent with the explanation given</li>
+            <li>Child flinches, recoils, or shows fear at sudden movements from adults</li>
+            <li>Reluctance to go home or to a specific person</li>
+          </ul>
+          <div class="tab-section-label">What you might hear a child say</div>
+          <ul class="tab-list">
+            <li><em>"My dad hurt me."</em></li>
+            <li><em>"I fell"</em> — paired with an injury that doesn't fit</li>
+            <li><em>"I'm not supposed to talk about it."</em></li>
+          </ul>
+          <div class="tab-section-label">Normal vs. concerning</div>
+          <div class="tab-note">Scrapes and bruises on knees, shins, and forehead are typical for active toddlers. Multiple bruises in soft tissue areas, patterned marks, or injuries the child can't explain are not.</div>
+        </div>
+
+        <!-- Neglect -->
+        <div class="tab-panel" id="tab-neglect" role="tabpanel">
+          <div class="tab-panel-badge">Neglect</div>
+          <div class="tab-section-label">Observable signs</div>
+          <ul class="tab-list">
+            <li>Consistently hungry — asking for food, hoarding snacks</li>
+            <li>Poor hygiene — unwashed clothing, body odor, matted hair (ongoing, not occasional)</li>
+            <li>Clothing inappropriate for the weather</li>
+            <li>Untreated medical or dental conditions</li>
+            <li>Extreme fatigue — falling asleep repeatedly, reports of not sleeping at home</li>
+            <li>Child left unsupervised at home or describes being alone regularly</li>
+          </ul>
+          <div class="tab-section-label">What you might hear a child say</div>
+          <ul class="tab-list">
+            <li><em>"There's no food at my house."</em></li>
+            <li><em>"Nobody was home when I got there."</em></li>
+            <li><em>"I don't have a jacket."</em></li>
+          </ul>
+          <div class="tab-section-label">Normal vs. concerning</div>
+          <div class="tab-note">Children have off days — occasional messy hair or a forgotten jacket is normal. A pattern of the same concerns across multiple days or weeks is not.</div>
+        </div>
+
+        <!-- Emotional Abuse -->
+        <div class="tab-panel" id="tab-emotional" role="tabpanel">
+          <div class="tab-panel-badge">Emotional Abuse</div>
+          <div class="tab-section-label">Observable signs</div>
+          <ul class="tab-list">
+            <li>Extreme behaviors: severe aggression, or extreme withdrawal and passivity</li>
+            <li>Persistent low self-esteem: <em>"I'm stupid," "I can't do anything right"</em></li>
+            <li>Delayed emotional development</li>
+            <li>Excessive need for approval or fear of making mistakes</li>
+            <li>Child describes being called names, threatened, or humiliated at home</li>
+          </ul>
+          <div class="tab-section-label">What you might hear a child say</div>
+          <ul class="tab-list">
+            <li><em>"My mom says I'm bad."</em></li>
+            <li><em>"I'm going to get in trouble if I do that wrong."</em></li>
+            <li><em>"Nobody likes me at home."</em></li>
+          </ul>
+          <div class="tab-section-label">Normal vs. concerning</div>
+          <div class="tab-note">All children have moments of self-doubt or emotional outbursts. A persistent pattern — especially language a child wouldn't naturally have without hearing it repeatedly — is worth documenting.</div>
+        </div>
+
+        <!-- Sexual Abuse -->
+        <div class="tab-panel" id="tab-sexual" role="tabpanel">
+          <div class="tab-panel-badge">Sexual Abuse</div>
+          <div class="tab-section-label">Observable signs</div>
+          <ul class="tab-list">
+            <li>Age-inappropriate sexual knowledge, language, or behavior</li>
+            <li>Reluctance to be around a specific adult (that was not previously present)</li>
+            <li>Physical indicators (bruising or discomfort in private areas)</li>
+            <li>Regressive behavior: bedwetting, thumb-sucking after developmental milestone</li>
+            <li>Nightmares or sleep disruption reported by parents or observed at rest time</li>
+            <li>Drawing or play with sexual themes beyond what's developmentally expected</li>
+          </ul>
+          <div class="tab-section-label">What you might hear a child say</div>
+          <ul class="tab-list">
+            <li>A child describing sexual acts using language they shouldn't know</li>
+            <li><em>"[Person] touches me in a bad way."</em></li>
+            <li><em>"I have a secret I'm not allowed to tell."</em></li>
+          </ul>
+          <div class="tab-section-label">Normal vs. concerning</div>
+          <div class="tab-note">Young children naturally explore their bodies and have some curiosity about differences. Explicit sexual knowledge, grooming-type language ("this is our secret"), or physical indicators are not developmentally normal.</div>
+        </div>
+      </div>
+
+      <div class="sky-callout">
+        <div class="sky-callout-label">Documentation</div>
+        <p>If you notice any of these signs — write it down the same day. Date, time, what you observed, exactly what the child said (in their words). Do not interpret or editorialize. Stick to what you saw and heard. This documentation matters — both for your protection and for the child's.</p>
+      </div>
+
+      <div class="section-continue">
+        <button class="btn-coral" onclick="completeSection(2)">I know what to look for — now show me how to report →</button>
+      </div>
+      <button class="help-link" onclick="toggleHelp('help-2')">I need help with this</button>
+      <div class="help-panel" id="help-2">
+        <p>Not sure if what you're seeing is a concern? Document it, date it, and bring it to your director. When in doubt — write it down.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 3 — WHEN TO REPORT -->
+    <div class="section" id="section-3" data-section="3">
+      <div class="eyebrow-pill">The Threshold</div>
+
+      <div class="situation-hook">
+        <p>"You've noticed things over the past two weeks. A bruise here. A comment there. Nothing you can 'prove.' You keep waiting to be sure. Here's what Virginia law says about waiting until you're sure."</p>
+      </div>
+
+      <p class="body-copy">Virginia law does not require certainty. It requires <strong>reasonable suspicion.</strong></p>
+      <p class="body-copy">If you have observed signs that a reasonable person in your position would find concerning — that is enough. The moment you cross that threshold, the obligation to report is active.</p>
+
+      <p class="body-copy" style="font-weight:700;color:var(--charcoal);margin-bottom:16px;">For each situation below: would you report, or document and watch?</p>
+
+      <div class="decision-block" id="decision-block">
+        <div class="decision-card" id="dec-1">
+          <div class="decision-text">"A 4-year-old has a large bruise on their upper arm. When you ask about it, they say 'I don't know.' The parent at drop-off said nothing."</div>
+          <div class="decision-btns">
+            <button class="decision-btn" onclick="answerDecision(1,'report','report')">Report</button>
+            <button class="decision-btn" onclick="answerDecision(1,'watch','report')">Document &amp; Watch</button>
+          </div>
+          <div class="decision-feedback" id="dec-feedback-1"></div>
+        </div>
+
+        <div class="decision-card" id="dec-2">
+          <div class="decision-text">"A child comes in without a proper coat for the third time this week in 40-degree weather. They say 'we don't have one.'"</div>
+          <div class="decision-btns">
+            <button class="decision-btn" onclick="answerDecision(2,'report','report')">Report</button>
+            <button class="decision-btn" onclick="answerDecision(2,'watch','report')">Document &amp; Watch</button>
+          </div>
+          <div class="decision-feedback" id="dec-feedback-2"></div>
+        </div>
+
+        <div class="decision-card" id="dec-3">
+          <div class="decision-text">"A child had a meltdown yesterday and today seems tired and sad. Drop-off seemed rushed."</div>
+          <div class="decision-btns">
+            <button class="decision-btn" onclick="answerDecision(3,'report','watch')">Report</button>
+            <button class="decision-btn" onclick="answerDecision(3,'watch','watch')">Document &amp; Watch</button>
+          </div>
+          <div class="decision-feedback" id="dec-feedback-3"></div>
+        </div>
+      </div>
+
+      <div class="sky-callout hidden" id="s3-callout">
+        <div class="sky-callout-label">The rule worth keeping</div>
+        <p>When in doubt — document it. If concern grows, report it. You will never be penalized for documenting too carefully. But failing to report when the threshold was crossed is a legal risk.</p>
+      </div>
+
+      <div class="section-continue hidden" id="s3-continue">
+        <button class="btn-coral" onclick="completeSection(3)">I understand when to report — show me how →</button>
+      </div>
+      <button class="help-link" onclick="toggleHelp('help-3')">I need help with this</button>
+      <div class="help-panel" id="help-3">
+        <p>Unsure whether to report? The CPS hotline accepts consultation calls — you can describe what you've observed and they will help you decide. 1-800-552-7096.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 4 — HOW TO REPORT -->
+    <div class="section" id="section-4" data-section="4">
+      <div class="eyebrow-pill">The Process</div>
+
+      <div class="situation-hook">
+        <p>"You know you need to report. Now what? Who do you call? What do you say? What happens after? Here is the exact process — step by step."</p>
+      </div>
+
+      <div class="steps-flow">
+
+        <!-- Step 1 -->
+        <div class="step-item">
+          <div class="step-connector">
+            <div class="step-circle s-coral">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Call Virginia CPS — right away.</div>
+            <div class="step-sub">Do not wait for the end of the day. Do not ask a coworker to do it. The obligation is yours. Call as soon as it is safe to do so.</div>
+            <div class="cps-card">
+              <div class="cps-card-header">
+                <div class="cps-card-name">Virginia Child Protective Services</div>
+                <div class="cps-card-hours">24 hours a day, 7 days a week</div>
+              </div>
+              <div class="cps-card-body">
+                <div class="cps-number">1-800-552-7096</div>
+                <div class="cps-card-btns">
+                  <button class="btn-coral-outline" onclick="copyNumber()" style="font-size:13px;padding:8px 18px;">Copy number</button>
+                </div>
+                <div class="cps-what-ready" id="cps-what-ready">
+                  <button class="cps-what-ready-trigger" onclick="toggleWhatReady()">
+                    <span>What to have ready</span>
+                    <span class="cps-what-ready-icon">▼</span>
+                  </button>
+                  <div class="cps-what-ready-body">
+                    <ul>
+                      <li>Child's name, age, and classroom</li>
+                      <li>Your name and role (you are a mandated reporter)</li>
+                      <li>What you observed — dates, specific behaviors, exact words the child used</li>
+                      <li>Any prior documentation you've made</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="script-card">
+              <div class="script-label">What to say — tap to copy</div>
+              <span id="script-text">"My name is [your name]. I am a childcare worker at Bright Beginnings Preschool in Charlottesville, Virginia. I am a mandated reporter and I am calling to report a concern about a child in my care. The child's name is [name], age [age]. I have observed [describe what you saw, in your own words]."</span>
+              <br>
+              <button class="script-copy-btn" onclick="copyScript()">Copy this script</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-item">
+          <div class="step-connector">
+            <div class="step-circle s-charcoal">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Notify your site director — immediately after.</div>
+            <div class="step-sub">Once the CPS call is made, tell your director what you observed and that you have reported. This is not asking permission — it is informing them.</div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-item">
+          <div class="step-connector">
+            <div class="step-circle s-sky">3</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Complete a written report within 72 hours.</div>
+            <div class="step-sub">CPS will tell you what form is required. Your director can also help with this. The written report supplements the oral report — both are required.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="what-not-card">
+        <div class="what-not-label">What not to do</div>
+        <ul>
+          <li>Do not confront the parent or caregiver about your suspicion</li>
+          <li>Do not promise a child that you will "keep it between us"</li>
+          <li>Do not wait to see if it happens again before reporting</li>
+          <li>Do not investigate on your own — your job is to report, not to determine what happened</li>
+          <li>Do not discuss the report with coworkers who are not directly involved</li>
+        </ul>
+      </div>
+
+      <div class="section-continue">
+        <button class="btn-coral" onclick="completeSection(4)">Got it — what happens after I report? →</button>
+      </div>
+      <button class="help-link" onclick="toggleHelp('help-4')">I need help with this</button>
+      <div class="help-panel" id="help-4">
+        <p>Need help with the reporting process? Your director can walk through it with you. But remember: the obligation to report is yours — not your director's.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 5 — AFTER YOU REPORT -->
+    <div class="section" id="section-5" data-section="5">
+      <div class="eyebrow-pill">What Happens Next</div>
+
+      <p class="body-copy">Making a report can feel heavy. You may feel uncertain, worried about the child, or anxious about the family. Those feelings are normal. Here is what you can expect after the call.</p>
+
+      <div class="timeline-wrap">
+        <div class="timeline-inner">
+          <div class="timeline-card">
+            <div class="timeline-card-label">Immediately</div>
+            <div class="timeline-card-title">CPS receives your report</div>
+            <p>CPS receives your report and assigns it a priority level based on the information you provided. A high-priority report will receive a response within 24 hours.</p>
+          </div>
+          <div class="timeline-card">
+            <div class="timeline-card-label">The investigation</div>
+            <div class="timeline-card-title">Not your job</div>
+            <p>CPS investigators are trained for this. They will contact the family, interview the child, and consult with other professionals. You may or may not be contacted for follow-up.</p>
+          </div>
+          <div class="timeline-card">
+            <div class="timeline-card-label">Confidentiality</div>
+            <div class="timeline-card-title">Protected by law</div>
+            <p>The contents of your report are confidential by law. You will not be told the outcome of the investigation unless you are directly involved in proceedings. This protects the child.</p>
+          </div>
+          <div class="timeline-card">
+            <div class="timeline-card-label">Going forward</div>
+            <div class="timeline-card-title">Your role continues</div>
+            <p>Continue to document your observations. Be consistent in how you treat the child — warmth, routine, and stability are protective factors. Cooperate fully if contacted by CPS.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="yellow-callout">
+        <div class="yellow-callout-label">Your protection</div>
+        <p>Virginia law protects good-faith reporters from civil and criminal liability. If you reported based on honest observation — you are protected. Always. Your job is to report what you saw. What happens next is not your burden to carry.</p>
+      </div>
+
+      <div class="sky-callout">
+        <div class="sky-callout-label">If you need support</div>
+        <p>Reporting is emotionally hard. If you are struggling after making a report, talk to your director or contact BB's EAP (Employee Assistance Program). You don't have to process this alone.</p>
+      </div>
+
+      <div class="tf-block">
+        <div class="tf-question">True or false — you should wait until you are certain abuse has occurred before making a report.</div>
+        <div class="tf-btns">
+          <button class="tf-btn" id="tf-true" onclick="answerTF('true')">True</button>
+          <button class="tf-btn" id="tf-false" onclick="answerTF('false')">False</button>
+        </div>
+        <div class="tf-feedback" id="tf-feedback"></div>
+      </div>
+
+      <div class="section-continue hidden" id="s5-continue">
+        <button class="btn-coral" onclick="completeSection(5)">Last section — let's practice the full process →</button>
+      </div>
+      <button class="help-link" onclick="toggleHelp('help-5')">I need help with this</button>
+      <div class="help-panel" id="help-5">
+        <p>Feeling unsettled after reporting? Talk to your director or access BB's Employee Assistance Program. You don't have to carry this alone.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 6 — PRACTICE & BB PROTOCOL -->
+    <div class="section print-section" id="section-6" data-section="6">
+      <div class="eyebrow-pill">Putting It Together</div>
+
+      <div class="situation-hook">
+        <p>"Everything you've learned is only useful if you can apply it in the moment — when you're tired, when you're uncertain, and when it involves a child you know."</p>
+      </div>
+
+      <div class="protocol-card" id="protocol-card">
+        <div class="protocol-card-accent"></div>
+        <div class="protocol-card-body">
+          <div class="protocol-card-title">BB's Mandated Reporting Protocol</div>
+          <div class="protocol-step">
+            <div class="protocol-num">1</div>
+            <div class="protocol-step-text">Trust your instinct — document what you observed with date and time</div>
+          </div>
+          <div class="protocol-step">
+            <div class="protocol-num">2</div>
+            <div class="protocol-step-text">When reasonable suspicion exists — call CPS: <strong>1-800-552-7096</strong></div>
+          </div>
+          <div class="protocol-step">
+            <div class="protocol-num">3</div>
+            <div class="protocol-step-text">Notify your site director immediately after</div>
+          </div>
+          <div class="protocol-step">
+            <div class="protocol-num">4</div>
+            <div class="protocol-step-text">Complete written report within 72 hours</div>
+          </div>
+          <div class="protocol-step">
+            <div class="protocol-num">5</div>
+            <div class="protocol-step-text">Continue to support the child with warmth and routine</div>
+          </div>
+        </div>
+        <div class="protocol-card-footer">
+          <span class="protocol-footer-note">Keep this where you can find it.</span>
+          <button class="btn-coral-outline" onclick="copyProtocol()" style="font-size:13px;padding:8px 18px;">Save this protocol</button>
+        </div>
+      </div>
+
+      <p class="body-copy" style="font-weight:700;color:var(--charcoal);margin-bottom:8px;">Final practice — let's apply everything.</p>
+
+      <div class="capstone-scenario-hook">
+        <p>You are a teacher at BB's Greenbrier site. Over the past three days, you've noticed that 3-year-old Jaylen has been unusually quiet and clingy. Today at arrival, you notice redness and what looks like a linear mark on the back of his left hand. When you gently ask if he's okay, he says "I got in trouble." His dad drops him off quickly without making eye contact.</p>
+      </div>
+
+      <!-- Q1 -->
+      <div class="capstone-q active" id="cap-q1">
+        <div class="capstone-q-label">Question 1 of 5</div>
+        <div class="capstone-q-text">Do you have enough to report?</div>
+        <div class="capstone-tap-btns">
+          <button class="capstone-tap-btn" onclick="answerCap(1,'yes','yes',this)">Yes — report now</button>
+          <button class="capstone-tap-btn" onclick="answerCap(1,'no','yes',this)">No — wait and watch</button>
+        </div>
+        <div class="capstone-feedback" id="cap-fb-1"></div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="capstone-q" id="cap-q2">
+        <div class="capstone-q-label">Question 2 of 5</div>
+        <div class="capstone-q-text">What is your first call?</div>
+        <div class="capstone-tap-btns" style="flex-direction:column;max-width:360px;">
+          <button class="capstone-tap-btn" onclick="answerCap(2,'director','cps',this)">Your site director</button>
+          <button class="capstone-tap-btn" onclick="answerCap(2,'cps','cps',this)">Virginia CPS — 1-800-552-7096</button>
+          <button class="capstone-tap-btn" onclick="answerCap(2,'parent','cps',this)">Jaylen's parent</button>
+        </div>
+        <div class="capstone-feedback" id="cap-fb-2"></div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="capstone-q" id="cap-q3">
+        <div class="capstone-q-label">Question 3 of 5</div>
+        <div class="capstone-q-text">What do you tell CPS?</div>
+        <div class="capstone-tap-btns" style="flex-direction:column;max-width:400px;">
+          <button class="capstone-tap-btn" onclick="answerCap(3,'vague','specific',this)">"I think a child might be being abused"</button>
+          <button class="capstone-tap-btn" onclick="answerCap(3,'specific','specific',this)">Jaylen's name and age, what you observed over three days, and the child's exact words</button>
+          <button class="capstone-tap-btn" onclick="answerCap(3,'parent','specific',this)">"A parent seems aggressive and I'm concerned"</button>
+        </div>
+        <div class="capstone-feedback" id="cap-fb-3"></div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="capstone-q" id="cap-q4">
+        <div class="capstone-q-label">Question 4 of 5</div>
+        <div class="capstone-q-text">You make the CPS call. Jaylen's dad walks back in to drop off a forgotten bag and asks if everything is okay. What do you say?</div>
+        <div class="capstone-tap-btns" style="flex-direction:column;max-width:400px;">
+          <button class="capstone-tap-btn" onclick="answerCap(4,'disclose','nothing',this)">"I just called CPS about a concern I had."</button>
+          <button class="capstone-tap-btn" onclick="answerCap(4,'nothing','nothing',this)">"Everything is fine — have a great day."</button>
+          <button class="capstone-tap-btn" onclick="answerCap(4,'hint','nothing',this)">"I've noticed some things I wanted to check on. Nothing to worry about."</button>
+        </div>
+        <div class="capstone-feedback" id="cap-fb-4"></div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="capstone-q" id="cap-q5">
+        <div class="capstone-q-label">Question 5 of 5</div>
+        <div class="capstone-q-text">How do you feel — and what's important to remember?</div>
+        <div class="capstone-tap-btns" style="flex-direction:column;max-width:400px;">
+          <button class="capstone-tap-btn" onclick="answerCap(5,'guilty','protected',this)">"Guilty — what if I was wrong?"</button>
+          <button class="capstone-tap-btn" onclick="answerCap(5,'protected','protected',this)">"I reported what I honestly observed. I'm protected, and I did the right thing."</button>
+          <button class="capstone-tap-btn" onclick="answerCap(5,'relieved','protected',this)">"Relieved it's over and I don't need to think about it again."</button>
+        </div>
+        <div class="capstone-feedback" id="cap-fb-5"></div>
+      </div>
+
+      <button class="help-link" onclick="toggleHelp('help-6')">I need help with this</button>
+      <div class="help-panel" id="help-6">
+        <p>Questions about BB's protocol? Ask your site director. They have the same training you do.</p>
+      </div>
+    </div>
+
+  </div><!-- /module-content -->
+
+  <!-- MILESTONE SCREEN -->
+  <div id="milestone-card">
+    <div class="milestone-inner">
+      <div class="milestone-icon">
+        <svg class="milestone-star" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="var(--coral)" stroke="var(--coral)" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="milestone-title">Module 2 complete.</div>
+      <div class="milestone-sub">You now know how to recognize signs of concern, understand your legal role as a mandated reporter, and know exactly what to do — step by step — if a child needs protection.</div>
+      <div class="milestone-learned">
+        <div class="milestone-learned-title">What you've learned</div>
+        <div class="milestone-item"><div class="check-circle">✓</div><span>The signs of physical abuse, neglect, emotional abuse, and sexual abuse</span></div>
+        <div class="milestone-item"><div class="check-circle">✓</div><span>Your legal obligation as a mandated reporter under Virginia law</span></div>
+        <div class="milestone-item"><div class="check-circle">✓</div><span>The reporting process — who to call, what to say, and what happens next</span></div>
+        <div class="milestone-item"><div class="check-circle">✓</div><span>BB's internal protocol and how to support a child after a report</span></div>
+      </div>
+      <button class="milestone-cta" onclick="saveProtocolCard()">Save BB Protocol Card</button>
+      <button class="milestone-review-link" onclick="reviewModule()">Review any section →</button>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ── STATE ──────────────────────────────────────────────────
+const STORAGE_KEY = 'bb_module2_progress';
+let progress = loadProgress();
+let decisionsAnswered = { 1: false, 2: false, 3: false };
+let capstoneStep = 1;
+let tfAnswered = false;
+
+// ── PERSISTENCE ────────────────────────────────────────────
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return { completedSections: [], quizAnswers: {}, startedAt: null, completedAt: null };
+}
+
+function saveProgress() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  } catch(e) {}
+}
+
+// ── START MODULE ───────────────────────────────────────────
+function startModule() {
+  document.getElementById('cover-screen').style.display = 'none';
+  document.getElementById('progress-bar').classList.add('visible');
+  if (!progress.startedAt) {
+    progress.startedAt = new Date().toISOString();
+    saveProgress();
+  }
+  revealSection(1);
+  updateProgressBar();
+}
+
+// ── SECTION REVEAL ─────────────────────────────────────────
+function revealSection(n) {
+  const el = document.getElementById('section-' + n);
+  if (!el) return;
+  el.classList.add('revealed');
+  el.classList.remove('locked-placeholder');
+  setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+}
+
+function completeSection(n) {
+  if (!progress.completedSections.includes(n)) {
+    progress.completedSections.push(n);
+    saveProgress();
+  }
+  updateProgressBar();
+  if (n < 6) {
+    revealSection(n + 1);
+  }
+}
+
+// ── PROGRESS BAR ───────────────────────────────────────────
+function updateProgressBar() {
+  const count = progress.completedSections.length;
+  const pct = Math.round((count / 6) * 100);
+  document.getElementById('pb-fill').style.width = pct + '%';
+  document.getElementById('pb-label').textContent = 'You\'ve completed Step ' + count + ' of 6';
+
+  for (let i = 1; i <= 6; i++) {
+    const dot = document.getElementById('dot-' + i);
+    dot.classList.remove('completed', 'current');
+    if (progress.completedSections.includes(i)) {
+      dot.classList.add('completed');
+      dot.textContent = '✓';
+    } else if (i === count + 1) {
+      dot.classList.add('current');
+      dot.textContent = i;
+    } else {
+      dot.textContent = i;
+    }
+  }
+}
+
+// ── RESTORE STATE ON LOAD ──────────────────────────────────
+function restoreState() {
+  if (progress.startedAt) {
+    document.getElementById('cover-screen').style.display = 'none';
+    document.getElementById('progress-bar').classList.add('visible');
+    updateProgressBar();
+    const max = Math.max(...progress.completedSections, 0);
+    for (let i = 1; i <= max; i++) {
+      const el = document.getElementById('section-' + i);
+      if (el) el.classList.add('revealed');
+    }
+    if (max < 6) {
+      const next = document.getElementById('section-' + (max + 1));
+      if (next) next.classList.add('revealed');
+    }
+    if (progress.completedSections.includes(3)) {
+      const cont = document.getElementById('s3-continue');
+      if (cont) cont.classList.remove('hidden');
+      const callout = document.getElementById('s3-callout');
+      if (callout) callout.classList.remove('hidden');
+    }
+    if (progress.completedSections.includes(5)) {
+      const cont = document.getElementById('s5-continue');
+      if (cont) cont.classList.remove('hidden');
+    }
+  }
+  if (progress.completedAt) {
+    document.getElementById('milestone-card').classList.add('visible');
+  }
+}
+
+// ── HELP PANELS ────────────────────────────────────────────
+function toggleHelp(id) {
+  const panel = document.getElementById(id);
+  panel.classList.toggle('open');
+}
+
+// ── ACCORDION ─────────────────────────────────────────────
+function toggleAccordion(id) {
+  const item = document.getElementById(id);
+  const isOpen = item.classList.contains('open');
+  item.classList.toggle('open');
+  const trigger = item.querySelector('.accordion-trigger');
+  trigger.setAttribute('aria-expanded', !isOpen);
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function switchTab(name) {
+  const panels = document.querySelectorAll('.tab-panel');
+  const btns = document.querySelectorAll('.tab-btn');
+  panels.forEach(p => p.classList.remove('active'));
+  btns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+  const panel = document.getElementById('tab-' + name);
+  if (panel) panel.classList.add('active');
+  btns.forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + name + "'")) {
+      b.classList.add('active');
+      b.setAttribute('aria-selected', 'true');
+    }
+  });
+}
+
+// ── DECISION SCENARIOS ─────────────────────────────────────
+function answerDecision(n, chosen, correct) {
+  if (decisionsAnswered[n]) return;
+  decisionsAnswered[n] = true;
+
+  const card = document.getElementById('dec-' + n);
+  const fb = document.getElementById('dec-feedback-' + n);
+  const btns = card.querySelectorAll('.decision-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const isCorrect = (chosen === correct);
+
+  btns.forEach(b => {
+    const label = b.textContent.trim();
+    const isReport = label === 'Report';
+    const isWatch = !isReport;
+    if (chosen === 'report' && isReport) b.classList.add(isCorrect ? 'selected-report' : 'selected-watch');
+    if (chosen === 'watch' && isWatch) b.classList.add(isCorrect ? 'selected-watch' : 'selected-report');
+    if (correct === 'report' && isReport && !isCorrect) b.classList.add('selected-report');
+    if (correct === 'watch' && isWatch && !isCorrect) b.classList.add('selected-watch');
+  });
+
+  if (n === 1) {
+    fb.className = 'decision-feedback report';
+    if (isCorrect) {
+      fb.textContent = 'Report. Unexplained bruising in a soft tissue area in a child who can\'t explain it meets the threshold for reasonable suspicion.';
+    } else {
+      fb.textContent = 'Report. Unexplained bruising in a soft tissue area in a child who can\'t explain it meets the threshold for reasonable suspicion.';
+    }
+  } else if (n === 2) {
+    fb.className = 'decision-feedback report';
+    if (isCorrect) {
+      fb.textContent = 'Report. A pattern of a child being exposed to the elements without adequate clothing is a form of neglect — not a one-time oversight.';
+    } else {
+      fb.textContent = 'Report. A pattern of a child being exposed to the elements without adequate clothing is a form of neglect — not a one-time oversight.';
+    }
+  } else if (n === 3) {
+    fb.className = 'decision-feedback watch';
+    if (isCorrect) {
+      fb.textContent = 'Document & Watch. This is not unusual behavior. Document what you observed with date and time. Look for patterns before escalating.';
+    } else {
+      fb.textContent = 'Document & Watch. This is not unusual behavior. Document what you observed with date and time. Look for patterns before escalating.';
+    }
+  }
+
+  fb.style.display = 'block';
+  checkAllDecisions();
+}
+
+function checkAllDecisions() {
+  if (decisionsAnswered[1] && decisionsAnswered[2] && decisionsAnswered[3]) {
+    setTimeout(() => {
+      const callout = document.getElementById('s3-callout');
+      callout.classList.remove('hidden');
+      const cont = document.getElementById('s3-continue');
+      cont.classList.remove('hidden');
+      cont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 600);
+  }
+}
+
+// ── CPS WHAT TO HAVE READY ─────────────────────────────────
+function toggleWhatReady() {
+  document.getElementById('cps-what-ready').classList.toggle('open');
+}
+
+// ── TRUE/FALSE QUIZ ────────────────────────────────────────
+function answerTF(answer) {
+  if (tfAnswered) return;
+  tfAnswered = true;
+
+  const trueBtn = document.getElementById('tf-true');
+  const falseBtn = document.getElementById('tf-false');
+  const fb = document.getElementById('tf-feedback');
+
+  trueBtn.disabled = true;
+  falseBtn.disabled = true;
+
+  if (answer === 'false') {
+    falseBtn.classList.add('correct');
+    fb.className = 'tf-feedback correct';
+    fb.innerHTML = '<strong>Exactly right.</strong> Reasonable suspicion is the threshold — not certainty. The investigation is CPS\'s job.';
+  } else {
+    trueBtn.classList.add('guided');
+    falseBtn.classList.add('correct');
+    fb.className = 'tf-feedback guided';
+    fb.textContent = 'Actually, Virginia law requires reporting at the level of reasonable suspicion — which means a genuine concern based on what you\'ve observed. Certainty is not the standard. CPS determines what happened — your job is to report the concern.';
+  }
+
+  fb.style.display = 'block';
+
+  setTimeout(() => {
+    const cont = document.getElementById('s5-continue');
+    cont.classList.remove('hidden');
+    cont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 800);
+}
+
+// ── CAPSTONE ───────────────────────────────────────────────
+const capAnswers = {
+  1: { correct: 'yes', correctFb: 'That\'s right. You have a physical mark, a behavioral change over several days, and a statement from the child. Together, these meet the threshold for reasonable suspicion.', guidedFb: 'Let\'s think about what you have: a pattern of behavioral change, a physical mark in an unusual location, and a child saying "I got in trouble." Combined, these meet the threshold. You don\'t need more.' },
+  2: { correct: 'cps', correctFb: 'Exactly. CPS first. Then your director. Never the parent — not before the report.', guidedFb: 'Your director is step two, not step one. And you never contact the parent before making the report — that could put the child at greater risk. CPS first.' },
+  3: { correct: 'specific', correctFb: 'Exactly right. Specific, factual, and based on direct observation. Dates, what you saw, and the child\'s words verbatim.', guidedFb: 'CPS needs specifics — the child\'s name and age, what you observed and when, and exactly what Jaylen said. Vague concerns are harder to act on. Be specific.' },
+  4: { correct: 'nothing', correctFb: 'Right. You do not disclose the report to the parent. CPS will contact the family through the appropriate channel. Your job is done — let the process work.', guidedFb: 'Disclosing the report to the parent could put Jaylen at risk before CPS has a chance to respond. Say nothing about the report. Warmly and normally. Let CPS handle the family contact.' },
+  5: { correct: 'protected', correctFb: 'That\'s exactly right. Good-faith reporters are legally protected. You may never know the outcome — but you gave Jaylen the best possible chance. That is the job.', guidedFb: 'Being wrong doesn\'t make you liable — reporting in good faith does. And it\'s not entirely over: continue documenting your observations and supporting Jaylen with consistency and warmth.' }
+};
+
+function answerCap(q, chosen, correct, btn) {
+  const fb = document.getElementById('cap-fb-' + q);
+  const allBtns = btn.parentElement.querySelectorAll('.capstone-tap-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const isCorrect = (chosen === correct);
+  btn.classList.add(isCorrect ? 'correct' : 'guided');
+
+  if (!isCorrect) {
+    allBtns.forEach(b => {
+      const oc = b.getAttribute('onclick') || '';
+      if (oc.includes("'" + correct + "'")) b.classList.add('correct');
+    });
+  }
+
+  fb.className = 'capstone-feedback ' + (isCorrect ? 'correct' : 'guided');
+  fb.textContent = isCorrect ? capAnswers[q].correctFb : capAnswers[q].guidedFb;
+  fb.style.display = 'block';
+
+  setTimeout(() => {
+    if (q < 5) {
+      const next = document.getElementById('cap-q' + (q + 1));
+      if (next) {
+        next.classList.add('active');
+        next.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    } else {
+      completeSection(6);
+      setTimeout(triggerMilestone, 600);
+    }
+  }, 900);
+}
+
+function triggerMilestone() {
+  progress.completedAt = new Date().toISOString();
+  saveProgress();
+  document.getElementById('milestone-card').classList.add('visible');
+}
+
+// ── COPY FUNCTIONS ─────────────────────────────────────────
+function copyNumber() {
+  copyToClipboard('1-800-552-7096', 'Number copied!');
+}
+
+function copyScript() {
+  const text = 'My name is [your name]. I am a childcare worker at Bright Beginnings Preschool in Charlottesville, Virginia. I am a mandated reporter and I am calling to report a concern about a child in my care. The child\'s name is [name], age [age]. I have observed [describe what you saw, in your own words].';
+  copyToClipboard(text, 'Script copied!');
+}
+
+function copyProtocol() {
+  const text = `BB's Mandated Reporting Protocol
+
+1. Trust your instinct — document what you observed with date and time
+2. When reasonable suspicion exists — call CPS: 1-800-552-7096
+3. Notify your site director immediately after
+4. Complete written report within 72 hours
+5. Continue to support the child with warmth and routine`;
+  copyToClipboard(text, 'Protocol copied!');
+}
+
+function saveProtocolCard() {
+  window.print();
+}
+
+function copyToClipboard(text, msg) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showCopyToast(msg)).catch(() => fallbackCopy(text, msg));
+  } else {
+    fallbackCopy(text, msg);
+  }
+}
+
+function fallbackCopy(text, msg) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showCopyToast(msg); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+function showCopyToast(msg) {
+  let toast = document.getElementById('copy-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'copy-toast';
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--charcoal);color:#fff;padding:10px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999;transition:opacity 400ms;pointer-events:none;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+}
+
+// ── MILESTONE ACTIONS ──────────────────────────────────────
+function reviewModule() {
+  document.getElementById('milestone-card').classList.remove('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── INIT ───────────────────────────────────────────────────
+restoreState();
+</script>
+</body>
+</html>

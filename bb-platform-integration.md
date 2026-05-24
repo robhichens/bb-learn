@@ -91,17 +91,10 @@ firebase deploy --only functions
 ```
 
 ⚠️ **Important — get the correct URL:**  
-This function is **Gen 2** (`v2/https`), so its URL is **not** the old `cloudfunctions.net` format.  
-After deploying, go to **Firebase Console → Functions → recordTrainingCompletion** and copy the trigger URL.  
-It will look like: `https://recordtrainingcompletion-XXXXXXXX-uc.a.run.app`  
-(The `XXXXXXXX` part is unique to your project — it only appears after first deploy.)
+✅ **Function is live.** Confirmed responding at:  
+`https://us-central1-bb-platform-5c296.cloudfunctions.net/recordTrainingCompletion`
 
-Then paste it into both bb-learn module files, replacing the placeholder:
-- `C:\Users\rober\bb-learn\bb-module1.html` — find `TRAINING_API =`
-- `C:\Users\rober\bb-learn\bb-module2.html` — find `TRAINING_API =`
-
-**Note on the URL currently in those files:**  
-The `us-central1-bb-platform-5c296.cloudfunctions.net` format is the Gen 1 URL — it won't reach a Gen 2 function. Update it to the Cloud Run URL once you have it from the console.
+Both `bb-module1.html` and `bb-module2.html` are already wired to this URL. No further action needed here.
 
 ---
 
